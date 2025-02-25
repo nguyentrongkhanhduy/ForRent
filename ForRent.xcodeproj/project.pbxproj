@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BB6A97FC2D6D398C00812BD0 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = BB6A97FB2D6D398C00812BD0 /* FirebaseAuth */; };
+		BB6A97FE2D6D398C00812BD0 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB6A97FD2D6D398C00812BD0 /* FirebaseCore */; };
+		BB6A98002D6D398C00812BD0 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = BB6A97FF2D6D398C00812BD0 /* FirebaseDatabase */; };
+		BB6A98022D6D398C00812BD0 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = BB6A98012D6D398C00812BD0 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BBD6E0012D696BF300EB8DF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +36,22 @@
 		BBD6E00A2D696BF300EB8DF6 /* ForRentUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForRentUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BB6A984E2D6D408000812BD0 /* Exceptions for "ForRent" folder in "ForRent" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BBD6DFEF2D696BF100EB8DF6 /* ForRent */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BBD6DFF22D696BF100EB8DF6 /* ForRent */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BB6A984E2D6D408000812BD0 /* Exceptions for "ForRent" folder in "ForRent" target */,
+			);
 			path = ForRent;
 			sourceTree = "<group>";
 		};
@@ -52,6 +72,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB6A98002D6D398C00812BD0 /* FirebaseDatabase in Frameworks */,
+				BB6A98022D6D398C00812BD0 /* FirebaseFirestore in Frameworks */,
+				BB6A97FE2D6D398C00812BD0 /* FirebaseCore in Frameworks */,
+				BB6A97FC2D6D398C00812BD0 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +136,10 @@
 			);
 			name = ForRent;
 			packageProductDependencies = (
+				BB6A97FB2D6D398C00812BD0 /* FirebaseAuth */,
+				BB6A97FD2D6D398C00812BD0 /* FirebaseCore */,
+				BB6A97FF2D6D398C00812BD0 /* FirebaseDatabase */,
+				BB6A98012D6D398C00812BD0 /* FirebaseFirestore */,
 			);
 			productName = ForRent;
 			productReference = BBD6DFF02D696BF100EB8DF6 /* ForRent.app */;
@@ -195,6 +223,9 @@
 			);
 			mainGroup = BBD6DFE72D696BF100EB8DF6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BB6A97FA2D6D398C00812BD0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BBD6DFF12D696BF100EB8DF6 /* Products */;
 			projectDirPath = "";
@@ -398,6 +429,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"ForRent/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ForRent/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -426,6 +458,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"ForRent/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ForRent/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -552,6 +585,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BB6A97FA2D6D398C00812BD0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.8.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BB6A97FB2D6D398C00812BD0 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6A97FA2D6D398C00812BD0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		BB6A97FD2D6D398C00812BD0 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6A97FA2D6D398C00812BD0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		BB6A97FF2D6D398C00812BD0 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6A97FA2D6D398C00812BD0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		BB6A98012D6D398C00812BD0 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB6A97FA2D6D398C00812BD0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BBD6DFE82D696BF100EB8DF6 /* Project object */;
 }
