@@ -28,14 +28,15 @@ struct ProfileView: View {
                 LoginView(tab: self.$tab)
             }
             .navigationDestination(isPresented: $toSignupScreen) {
-                SignupView()
+                SignupView(tab: self.$tab)
             }
         }//end of NavStack
-        .accentColor(Color(Constant.Color.primaryText))
     }
 }
 
 #Preview {
     @Previewable @State var test = 1
     ProfileView(tab: $test)
+        .environment(AuthenticationVM.shared)
+        .environment(UserVM.shared)
 }

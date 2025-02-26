@@ -26,7 +26,7 @@ struct WishlistView: View {
                 LoginView(tab: self.$tab)
             }
             .navigationDestination(isPresented: $toSignupScreen) {
-                SignupView()
+                SignupView(tab: self.$tab)
             }
         }//End of NavStack
     }//End of body
@@ -35,4 +35,6 @@ struct WishlistView: View {
 #Preview {
     @Previewable @State var test = 1
     WishlistView(tab: $test)
+        .environment(AuthenticationVM.shared)
+        .environment(UserVM.shared)
 }

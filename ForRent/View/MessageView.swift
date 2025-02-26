@@ -26,7 +26,7 @@ struct MessageView: View {
                 LoginView(tab: self.$tab)
             }
             .navigationDestination(isPresented: $toSignupScreen) {
-                SignupView()
+                SignupView(tab: self.$tab)
             }
         }//End of NavStack
     }//End of body
@@ -35,4 +35,6 @@ struct MessageView: View {
 #Preview {
     @Previewable @State var test = 1
     MessageView(tab: $test)
+        .environment(AuthenticationVM.shared)
+        .environment(UserVM.shared)
 }

@@ -15,4 +15,6 @@ struct ExploreView: View {
 
 #Preview {
     ExploreView()
+        .environment(AuthenticationVM.shared)
+        .environment(UserVM.shared)
 }

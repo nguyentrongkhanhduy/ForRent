@@ -61,9 +61,12 @@ struct ContentView: View {
                 }
             }
         }//End of NavStack
+        .accentColor(Color(Constant.Color.primaryText))
     }//End of body
 }
 
 #Preview {
     ContentView()
+        .environment(AuthenticationVM.shared)
+        .environment(UserVM.shared)
 }

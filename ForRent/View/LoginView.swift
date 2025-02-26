@@ -8,13 +8,38 @@
 import SwiftUI
 
 struct LoginView: View {
+    @Binding var tab: Int
+    
     @Environment(\.dismiss) private var dismiss
     @Environment(AuthenticationVM.self) var authenticationVM
     
-    @State private var email: String = ""
     @State private var password: String = ""
+    @State private var showAlert: Bool = false
     
-    @Binding var tab: Int
+    @AppStorage("rememberMe") private var rememberCredential: Bool = false
+    @AppStorage("savedEmail") private var savedEmail: String = ""
+    @AppStorage("savedPassword") private var savedPassword: String = ""
+
+    private func loadSavedCredentials() {
+        if rememberCredential {
+            authenticationVM.email = savedEmail
+            password = savedPassword
+        }
+    }
+    
+    private func performLogin() {
+        authenticationVM.loginUser(password: self.password)
+        if authenticationVM.errorMessage.isEmpty {
+            if rememberCredential {
+                savedEmail = authenticationVM.email
+                savedPassword = self.password
+            }
+            dismiss()
+            self.tab = 0
+        } else {
+            showAlert = true
+        }
+    }
     
     var body: some View {
         VStack {
@@ -24,37 +49,58 @@ struct LoginView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.top, 10)
             
-            TextField("Email", text: $email)
-                .font(.custom(Constant.Font.regular, size: 16))
-                .padding()
-                .foregroundStyle(Color(Constant.Color.primaryText))
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.clear)
-                        .stroke(Color(Constant.Color.primaryText), lineWidth: 1)
-                )
+            CustomizedTextField(
+                placeholder: "Email",
+                isSecure: false,
+                bindingText: Binding(get: {
+                    authenticationVM.email
+                }, set: { value in
+                    authenticationVM.email = value
+                })
+            )
                 .keyboardType(.emailAddress)
                 .padding(.top, 50)
             
-            SecureField("Password", text: $password)
-                .font(.custom(Constant.Font.regular, size: 16))
-                .padding()
-                .foregroundStyle(Color(Constant.Color.primaryText))
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.clear)
-                        .stroke(Color(Constant.Color.primaryText), lineWidth: 1)
-                )
+            CustomizedTextField(
+                placeholder: "Password",
+                isSecure: true,
+                bindingText: $password
+            )
                 .padding(.top, 10)
             
+            HStack {
+                Button {
+                    rememberCredential.toggle()
+                } label: {
+                    Image(systemName: rememberCredential ? "checkmark.square.fill" : "square")
+                        .resizable()
+                        .frame(width: 14, height: 14)
+                        .foregroundColor(Color(Constant.Color.primaryText))
+                    
+                    Text("Remember me")
+                        .font(.custom(Constant.Font.regular, size: 14))
+                        .foregroundStyle(Color(Constant.Color.primaryText))
+                }
+            }
+            .padding(.top, 5)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
             PrimaryButton(text: "Log in") {
-                dismiss()
-                self.tab = 0
+                performLogin()
             }
             .padding(.top, 10)
             Spacer()
         }//End of VStack
+        .onAppear() {
+            loadSavedCredentials()
+        }
         .padding(.horizontal)
+        .alert("Error", isPresented: $showAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(authenticationVM.errorMessage)
+        }
+
     }
 }
 
@@ -62,4 +108,5 @@ struct LoginView: View {
     @Previewable @State var test = 1
     LoginView(tab: $test)
         .environment(AuthenticationVM.shared)
+        .environment(UserVM.shared)
 }

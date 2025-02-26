@@ -10,6 +10,9 @@ import FirebaseCore
 
 @main
 struct ForRentApp: App {
+    @State private var authenticationVM = AuthenticationVM.shared
+    @State private var userVM = UserVM.shared
+    
     init() {
         FirebaseApp.configure()
     }
@@ -17,7 +20,8 @@ struct ForRentApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(AuthenticationVM.shared)
+                .environment(authenticationVM)
+                .environment(userVM)
         }
     }
 }
