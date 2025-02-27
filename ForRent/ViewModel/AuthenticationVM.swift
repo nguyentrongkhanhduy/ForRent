@@ -17,12 +17,22 @@ class AuthenticationVM {
         return Auth.auth()
     }
     
+    var isLoggedIn: Bool {
+        return dbAuth.currentUser != nil
+    }
+    var userID: String {
+        if isLoggedIn {
+            return dbAuth.currentUser!.uid
+        } else {
+            return ""
+        }
+    }
     var email: String = ""
     var errorMessage: String = ""
     
     private init() {}
     
-    func validateCredentials(email: String, password: String, confirmPassword: String = "", signUp: Bool = false) -> Bool {
+    func validateCredentials(email: String, password: String, confirmPassword: String = "", username: String = "", signUp: Bool = false) -> Bool {
         errorMessage = ""
         
         if email.isEmpty || password.isEmpty {
@@ -41,7 +51,7 @@ class AuthenticationVM {
         }
         
         if signUp {
-            if confirmPassword.isEmpty {
+            if confirmPassword.isEmpty || username.isEmpty {
                 errorMessage = "Please fill all fields"
                 return false
             }
@@ -62,37 +72,78 @@ class AuthenticationVM {
         return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
     }
     
-    func loginUser(password: String) {
+    func loginUser(password: String, completion: @escaping (Bool) -> Void) {
         if !validateCredentials(email: self.email, password: password) {
+            completion(false)
             return
         }
         
         dbAuth.signIn(withEmail: self.email, password: password) { result, error in
-            if let unwrappedError = error {
-                self.errorMessage = unwrappedError.localizedDescription
+            if error != nil {
+                self.errorMessage = "Incorrect email or password."
+                self.email = ""
+                completion(false)
             } else {
                 self.errorMessage = ""
+                completion(true)
             }
         }
     }
     
-    func signUpUser(password: String, confirmPassword: String) {
-        if !validateCredentials(
-            email: self.email,
-            password: password,
-            confirmPassword: confirmPassword,
-            signUp: true
-        ) {
-            return
-        }
-        
-        dbAuth
-            .createUser(withEmail: self.email, password: password) { result, error in
-                if let unwrappedError = error {
-                    self.errorMessage = unwrappedError.localizedDescription
-                } else {
-                    self.errorMessage = ""
-                }
+    func signUpUser(
+        password: String,
+        confirmPassword: String,
+        username: String,
+        completion: @escaping
+        (Bool) -> Void) {
+            if !validateCredentials(
+                email: self.email,
+                password: password,
+                confirmPassword: confirmPassword,
+                username: username,
+                signUp: true
+            ) {
+                completion(false)
+                return
             }
+            
+            dbAuth
+                .createUser(withEmail: self.email, password: password) { result, error in
+                    if let unwrappedError = error as NSError? {
+                        switch unwrappedError.code {
+                        case AuthErrorCode.emailAlreadyInUse.rawValue:
+                            self.errorMessage = "The email address is already in use."
+                        case AuthErrorCode.invalidEmail.rawValue:
+                            self.errorMessage = "Invalid email format."
+                        case AuthErrorCode.weakPassword.rawValue:
+                            self.errorMessage = "Password must be at least 6 characters."
+                        case AuthErrorCode.networkError.rawValue:
+                            self.errorMessage = "Network error. Check your internet connection."
+                        case AuthErrorCode.operationNotAllowed.rawValue:
+                            self.errorMessage = "Email/password sign-up is disabled."
+                        case AuthErrorCode.tooManyRequests.rawValue:
+                            self.errorMessage = "Too many attempts. Try again later."
+                        default:
+                            self.errorMessage = unwrappedError.localizedDescription
+                        }
+                        completion(false)
+                    } else {
+                        self.errorMessage = ""
+                        completion(true)
+                    }
+                }
+        }
+    
+    func signOut(completion: @escaping () -> Void) {
+        do {
+            try dbAuth.signOut()
+            self.email = ""
+            self.errorMessage = ""
+            UserVM.shared.user = User() //reset user
+            completion()
+        } catch {
+            print("Error signing out")
+            self.errorMessage = "Failed to sign out"
+        }
     }
 }

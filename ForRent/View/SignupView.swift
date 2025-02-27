@@ -20,15 +20,28 @@ struct SignupView: View {
     
     private func performSignup() {
         authenticationVM
-            .signUpUser(password: password, confirmPassword: confirmPassword)
-        if authenticationVM.errorMessage.isEmpty {
-            userVM.user.email = authenticationVM.email
-            userVM.createUser()
-            dismiss()
-            self.tab = 0
-        } else {
-            showAlert = true
-        }
+            .signUpUser(
+                password: password,
+                confirmPassword: confirmPassword,
+                username: userVM.user.username
+            ) { success in
+                if success {
+                    if userVM
+                        .setUserIDandEmail(
+                            uid: authenticationVM.userID,
+                            email: authenticationVM
+                                .email) {
+                        userVM.createUser()
+                        dismiss()
+                        self.tab = 0
+                    } else {
+                        print("ERR ERR")
+                    }
+                } else {
+                    showAlert = true
+                }
+                
+            }
     }
     
     var body: some View {

@@ -9,7 +9,7 @@ import Foundation
 
 struct User: Codable, Hashable {
     //required fields to sign up
-    var id = UUID()
+    var id = ""
     var email = ""
     var username = ""
     

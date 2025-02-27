@@ -15,6 +15,7 @@ struct ForRentApp: App {
     
     init() {
         FirebaseApp.configure()
+//        authenticationVM.signOut()
     }
     
     var body: some Scene {

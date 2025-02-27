@@ -1,13 +1,13 @@
 //
-//  PrimaryButton.swift
+//  SecondaryButton.swift
 //  ForRent
 //
-//  Created by Eddie Nguyen on 2025-02-24.
+//  Created by Eddie Nguyen on 2025-02-27.
 //
 
 import SwiftUI
 
-struct PrimaryButton: View {
+struct SecondaryButton: View {
     var text: String
     var action: () -> Void
     
@@ -23,7 +23,7 @@ struct PrimaryButton: View {
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(Constant.Color.primaryColor))
+                        .fill(Color(Constant.Color.primaryText))
                 )
         }
     }

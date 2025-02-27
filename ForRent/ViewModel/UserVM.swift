@@ -22,11 +22,20 @@ class UserVM {
     
     private init() {}
     
+    func setUserIDandEmail(uid: String, email: String) -> Bool {
+        if !uid.isEmpty && !email.isEmpty {
+            self.user.id = uid
+            self.user.email = email
+            return true
+        }
+        return false
+    }
+    
     func createUser() {
         do {
             try db
                 .collection("users")
-                .document(user.id.uuidString)
+                .document(user.id)
                 .setData(from: user)
             print(
                 "User created successfully in Firestore with UUID: \(String(describing: user.id))"

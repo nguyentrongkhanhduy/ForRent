@@ -20,7 +20,6 @@ struct TemporaryViewForLogin: View {
                     .foregroundStyle(Color(Constant.Color.sencondaryText))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 5)
-                    .padding(.horizontal)
                 
                 
             } else if screenId == 2 {
@@ -36,7 +35,6 @@ struct TemporaryViewForLogin: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.top, 5)
-                .padding(.horizontal)
                 
             } else {
                 VStack {
@@ -51,11 +49,9 @@ struct TemporaryViewForLogin: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.top, 5)
-                .padding(.horizontal)
             }
             
             PrimaryButton(text: "Log in") { toLogin() }
-            .padding(.horizontal)
             .padding(.top, 40)
 
             HStack {
@@ -70,7 +66,6 @@ struct TemporaryViewForLogin: View {
                 }
             }
             .foregroundStyle(Color(Constant.Color.primaryText))
-            .padding(.horizontal)
             .padding(.top, 15)
             .frame(maxWidth: .infinity, alignment: .leading)
                             
@@ -80,5 +75,5 @@ struct TemporaryViewForLogin: View {
 }
 
 #Preview {
-    TemporaryViewForLogin(screenId: 1) {} toSignup: {}
+    TemporaryViewForLogin(screenId: 3) {} toSignup: {}
 }

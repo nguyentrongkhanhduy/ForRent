@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct WishlistView: View {
+    @Environment(AuthenticationVM.self) var authenticationVM
+    @Environment(UserVM.self) var userVM
+    
     @State private var toLoginScreen = false
     @State private var toSignupScreen = false
     
@@ -16,12 +19,17 @@ struct WishlistView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                TemporaryViewForLogin(screenId: 1) {
-                    toLoginScreen = true
-                } toSignup: {
-                    toSignupScreen = true
+                if authenticationVM.isLoggedIn {
+                    
+                } else {
+                    TemporaryViewForLogin(screenId: 1) {
+                        toLoginScreen = true
+                    } toSignup: {
+                        toSignupScreen = true
+                    }
                 }
             }//End of VStack
+            .padding(.horizontal)
             .navigationDestination(isPresented: $toLoginScreen) {
                 LoginView(tab: self.$tab)
             }

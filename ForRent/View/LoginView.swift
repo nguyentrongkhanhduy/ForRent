@@ -12,6 +12,7 @@ struct LoginView: View {
     
     @Environment(\.dismiss) private var dismiss
     @Environment(AuthenticationVM.self) var authenticationVM
+    @Environment(UserVM.self) var userVM
     
     @State private var password: String = ""
     @State private var showAlert: Bool = false
@@ -28,16 +29,18 @@ struct LoginView: View {
     }
     
     private func performLogin() {
-        authenticationVM.loginUser(password: self.password)
-        if authenticationVM.errorMessage.isEmpty {
-            if rememberCredential {
-                savedEmail = authenticationVM.email
-                savedPassword = self.password
+        authenticationVM.loginUser(password: self.password) { success in
+            if success {
+                if rememberCredential {
+                    savedEmail = authenticationVM.email
+                    savedPassword = self.password
+                }
+                dismiss()
+                self.tab = 0
+            } else {
+                password = ""
+                showAlert = true
             }
-            dismiss()
-            self.tab = 0
-        } else {
-            showAlert = true
         }
     }
     
