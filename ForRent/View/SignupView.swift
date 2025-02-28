@@ -23,7 +23,8 @@ struct SignupView: View {
             .signUpUser(
                 password: password,
                 confirmPassword: confirmPassword,
-                username: userVM.user.username
+                username: userVM.user.username,
+                legalName: userVM.user.legalName
             ) { success in
                 if success {
                     if userVM
@@ -53,6 +54,12 @@ struct SignupView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 10)
                 
+                Text("Credentials")
+                    .font(.custom(Constant.Font.regular, size: 14))
+                    .foregroundStyle(Color(Constant.Color.primaryText))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 40)
+                
                 CustomizedTextField(
                     placeholder: "Email",
                     isSecure: false,
@@ -63,7 +70,6 @@ struct SignupView: View {
                     })
                 )
                 .keyboardType(.emailAddress)
-                .padding(.top, 50)
                 
                 CustomizedTextField(
                     placeholder: "Password",
@@ -78,6 +84,21 @@ struct SignupView: View {
                     bindingText: $confirmPassword
                 )
                 .padding(.top, 10)
+                
+                Text("Personal information")
+                    .font(.custom(Constant.Font.regular, size: 14))
+                    .foregroundStyle(Color(Constant.Color.primaryText))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 30)
+                CustomizedTextField(
+                    placeholder: "Legal name",
+                    isSecure: false,
+                    bindingText: Binding(get: {
+                        userVM.user.legalName
+                    }, set: { value in
+                        userVM.user.legalName = value
+                    })
+                )
                 
                 CustomizedTextField(
                     placeholder: "Display name",

@@ -32,7 +32,7 @@ class AuthenticationVM {
     
     private init() {}
     
-    func validateCredentials(email: String, password: String, confirmPassword: String = "", username: String = "", signUp: Bool = false) -> Bool {
+    func validateCredentials(email: String, password: String, confirmPassword: String = "", username: String = "", legalName: String = "", signUp: Bool = false) -> Bool {
         errorMessage = ""
         
         if email.isEmpty || password.isEmpty {
@@ -51,7 +51,7 @@ class AuthenticationVM {
         }
         
         if signUp {
-            if confirmPassword.isEmpty || username.isEmpty {
+            if confirmPassword.isEmpty || username.isEmpty || legalName.isEmpty {
                 errorMessage = "Please fill all fields"
                 return false
             }
@@ -94,6 +94,7 @@ class AuthenticationVM {
         password: String,
         confirmPassword: String,
         username: String,
+        legalName: String,
         completion: @escaping
         (Bool) -> Void) {
             if !validateCredentials(
@@ -101,6 +102,7 @@ class AuthenticationVM {
                 password: password,
                 confirmPassword: confirmPassword,
                 username: username,
+                legalName: legalName,
                 signUp: true
             ) {
                 completion(false)
@@ -144,6 +146,39 @@ class AuthenticationVM {
         } catch {
             print("Error signing out")
             self.errorMessage = "Failed to sign out"
+        }
+    }
+    
+    func changePassword(currentPassword: String, newPassword: String, completion: @escaping (Bool) -> Void) {
+        guard let user = dbAuth.currentUser, let email = user.email else {
+            self.errorMessage = "No authenticated user found."
+            completion(false)
+            return
+        }
+        
+        let credential = EmailAuthProvider.credential(
+            withEmail: email,
+            password: currentPassword
+        )
+        
+        user.reauthenticate(with: credential) { result, error in
+            if let unwrappedError = error {
+                DispatchQueue.main.async {
+                    self.errorMessage = "Re-authentication failed: \(unwrappedError.localizedDescription)"
+                    completion(false)
+                }
+                return
+            }
+            
+            user.updatePassword(to: newPassword) { error in
+                if error != nil {
+                    self.errorMessage = "New password update failed."
+                    completion(false)
+                } else {
+                    self.errorMessage = ""
+                    completion(true)
+                }
+            }
         }
     }
 }

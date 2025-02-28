@@ -11,6 +11,7 @@ struct User: Codable, Hashable {
     //required fields to sign up
     var id = ""
     var email = ""
+    var legalName = ""
     var username = ""
     
     //required fields to request/list a property
@@ -18,7 +19,8 @@ struct User: Codable, Hashable {
     var cardNumber = ""
     
     //optional fields (edit later)
+    var address = ""
     var wishList = [String]()
     var avatarURL = ""
-    var about = ""
+//    var about = ""
 }

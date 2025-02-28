@@ -35,8 +35,14 @@ struct LoginView: View {
                     savedEmail = authenticationVM.email
                     savedPassword = self.password
                 }
-                dismiss()
-                self.tab = 0
+                userVM.fetchUserInfo { fetched in
+                    if fetched {
+                        dismiss()
+                        self.tab = 0
+                    } else {
+                        print("Error loading user data")
+                    }
+                }
             } else {
                 password = ""
                 showAlert = true
