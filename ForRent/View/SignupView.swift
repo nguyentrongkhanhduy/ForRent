@@ -17,8 +17,10 @@ struct SignupView: View {
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     @State private var showAlert: Bool = false
+    @State private var isLoading: Bool = false
     
     private func performSignup() {
+        isLoading = true
         authenticationVM
             .signUpUser(
                 password: password,
@@ -26,27 +28,31 @@ struct SignupView: View {
                 username: userVM.user.username,
                 legalName: userVM.user.legalName
             ) { success in
-                if success {
-                    if userVM
-                        .setUserIDandEmail(
-                            uid: authenticationVM.userID,
-                            email: authenticationVM
-                                .email) {
-                        userVM.createUser()
-                        dismiss()
-                        self.tab = 0
+                DispatchQueue.main.async {
+                    isLoading = false
+                    if success {
+                        if userVM
+                            .setUserIDandEmail(
+                                uid: authenticationVM.userID,
+                                email: authenticationVM
+                                    .email) {
+                            userVM.createUser()
+                            dismiss()
+                            self.tab = 0
+                        } else {
+                            print("ERR ERR")
+                        }
                     } else {
-                        print("ERR ERR")
+                        showAlert = true
                     }
-                } else {
-                    showAlert = true
                 }
+                
                 
             }
     }
     
     var body: some View {
-        
+        ZStack {
             VStack {
                 Text("Sign up to ForRent")
                     .font(.custom(Constant.Font.semiBold, size: 20))
@@ -119,13 +125,22 @@ struct SignupView: View {
                 
                 Spacer()
             }//End of VStack
+            .opacity(isLoading ? 0.3 : 1)
             .padding(.horizontal)
             .alert("Error", isPresented: $showAlert) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(authenticationVM.errorMessage)
             }
-        
+            
+            
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .padding()
+                    .scaleEffect(2)
+            }
+        }
         
     }
 }
