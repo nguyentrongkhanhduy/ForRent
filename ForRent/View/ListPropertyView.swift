@@ -25,7 +25,7 @@ struct ListPropertyView: View {
                         }
                         .listRowSeparator(.hidden)
                         .listRowBackground(Color.clear)
-                        .padding(.bottom)
+                        .padding(.bottom, 10)
                     }
                 }
                 .scrollContentBackground(.hidden)

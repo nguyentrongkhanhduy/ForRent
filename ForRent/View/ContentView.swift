@@ -9,6 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
+    @State private var showSearchTab = false
+    
+    @State private var desiredPrice = ""
+    @State private var selectedArea = ""
+    @State private var selectedBath = ""
+    @State private var selectedBed = ""
+    @State private var selectedGuest = ""
+    @State private var selectedDate = Date()
     
     private var toolBarTitle: String {
         switch selectedTab {
@@ -23,6 +31,15 @@ struct ContentView: View {
         default:
             ""
         }
+    }
+    
+    private func printSelectedValue(){
+        print(desiredPrice)
+        print(selectedArea)
+        print(selectedBath)
+        print(selectedBed)
+        print(selectedGuest)
+        print(selectedDate)
     }
     
     var body: some View {
@@ -52,12 +69,37 @@ struct ContentView: View {
                     }
                     .tag(3)
             }//End of TabView
+            .background(.white)
             .tint(Color(Constant.Color.primaryColor))
+            .toolbarBackground(Color.white)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Text(self.toolBarTitle)
                         .font(.custom(Constant.Font.semiBold, size: 30))
                         .foregroundStyle(Color(Constant.Color.primaryText))
+                }
+                ToolbarItem(placement: .principal) {
+                    if selectedTab == 0 {
+                        SearchBar()
+                            .padding(.top)
+                            .onTapGesture {
+                                print("Search")
+                                showSearchTab = true
+                            }
+                    }
+                }
+            }
+            .sheet(isPresented: $showSearchTab) {
+                FilterView(
+                    desiredPrice: $desiredPrice,
+                    selectedArea: $selectedArea,
+                    selectedBed: $selectedBed,
+                    selectedBath: $selectedBath,
+                    selectedGuest: $selectedGuest,
+                    selectedDate: $selectedDate
+                ) {
+                    printSelectedValue()
+                    showSearchTab = false
                 }
             }
         }//End of NavStack
