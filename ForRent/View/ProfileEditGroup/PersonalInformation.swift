@@ -204,4 +204,6 @@ struct PersonalInformation: View {
     PersonalInformation()
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
+        .environment(PropertyVM.shared)
+        .environment(LocationVM.shared)
 }

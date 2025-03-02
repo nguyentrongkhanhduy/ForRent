@@ -12,11 +12,14 @@ import FirebaseCore
 struct ForRentApp: App {
     @State private var authenticationVM = AuthenticationVM.shared
     @State private var userVM = UserVM.shared
+    @State private var propertyVM = PropertyVM.shared
+    @State private var locationVM = LocationVM.shared
     
     init() {
         FirebaseApp.configure()
 //        authenticationVM.signOut {}
         userVM.fetchUserInfo { _ in }
+        propertyVM.fetchAllProperty()
     }
     
     var body: some Scene {
@@ -24,6 +27,8 @@ struct ForRentApp: App {
             ContentView()
                 .environment(authenticationVM)
                 .environment(userVM)
+                .environment(propertyVM)
+                .environment(locationVM)
         }
     }
 }

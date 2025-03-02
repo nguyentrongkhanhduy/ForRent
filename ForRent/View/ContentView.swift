@@ -28,7 +28,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             TabView(selection: $selectedTab) {
-                ExploreView()
+                ListPropertyView()
                     .tabItem {
                         Label("Explore", systemImage: "magnifyingglass")
                     }
@@ -69,4 +69,6 @@ struct ContentView: View {
     ContentView()
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
+        .environment(PropertyVM.shared)
+        .environment(LocationVM.shared)
 }

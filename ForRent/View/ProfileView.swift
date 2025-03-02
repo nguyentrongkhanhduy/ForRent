@@ -250,4 +250,6 @@ struct ProfileView: View {
     ProfileView(tab: $test)
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
+        .environment(PropertyVM.shared)
+        .environment(LocationVM.shared)
 }

@@ -150,4 +150,6 @@ struct SignupView: View {
     SignupView(tab: $test)
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
+        .environment(PropertyVM.shared)
+        .environment(LocationVM.shared)
 }

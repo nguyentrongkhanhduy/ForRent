@@ -137,4 +137,6 @@ struct ChangePasswordView: View {
     ChangePasswordView()
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
+        .environment(PropertyVM.shared)
+        .environment(LocationVM.shared)
 }

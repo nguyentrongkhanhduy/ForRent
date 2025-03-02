@@ -116,4 +116,6 @@ struct PaymentInfo: View {
     PaymentInfo()
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
+        .environment(PropertyVM.shared)
+        .environment(LocationVM.shared)
 }

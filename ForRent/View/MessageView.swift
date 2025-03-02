@@ -45,4 +45,6 @@ struct MessageView: View {
     MessageView(tab: $test)
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
+        .environment(PropertyVM.shared)
+        .environment(LocationVM.shared)
 }
