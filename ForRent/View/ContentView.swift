@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(AuthenticationVM.self) var authenticationVM
+    @Environment(UserVM.self) var userVM
+    @Environment(PropertyVM.self) var propertyVM
+    @Environment(LocationVM.self) var locationVM
+    
     @State private var selectedTab = 0
     @State private var showSearchTab = false
     
@@ -33,13 +38,15 @@ struct ContentView: View {
         }
     }
     
-    private func printSelectedValue(){
-        print(desiredPrice)
-        print(selectedArea)
-        print(selectedBath)
-        print(selectedBed)
-        print(selectedGuest)
-        print(selectedDate)
+    private func filterListProperty() {
+        print(propertyVM
+            .getFilteredProperties(
+                price: desiredPrice,
+                bath: String(selectedBath.prefix(1)),
+                bed: String(selectedBed.prefix(1)),
+                guest: String(selectedGuest.prefix(1)),
+                date: selectedDate
+            ))
     }
     
     var body: some View {
@@ -71,22 +78,11 @@ struct ContentView: View {
             }//End of TabView
             .background(.white)
             .tint(Color(Constant.Color.primaryColor))
-            .toolbarBackground(Color.white)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Text(self.toolBarTitle)
                         .font(.custom(Constant.Font.semiBold, size: 30))
                         .foregroundStyle(Color(Constant.Color.primaryText))
-                }
-                ToolbarItem(placement: .principal) {
-                    if selectedTab == 0 {
-                        SearchBar()
-                            .padding(.top)
-                            .onTapGesture {
-                                print("Search")
-                                showSearchTab = true
-                            }
-                    }
                 }
             }
             .sheet(isPresented: $showSearchTab) {
@@ -98,7 +94,6 @@ struct ContentView: View {
                     selectedGuest: $selectedGuest,
                     selectedDate: $selectedDate
                 ) {
-                    printSelectedValue()
                     showSearchTab = false
                 }
             }

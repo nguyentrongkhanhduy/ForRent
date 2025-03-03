@@ -35,23 +35,7 @@ struct ChangeAvatarView: View {
                 .padding(.top, 10)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            AsyncImage(url: URL(string: userVM.user.avatarURL)) { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150, height: 150)
-                    .clipShape(Circle())
-                    .overlay {
-                        Circle()
-                            .stroke(
-                                Color(Constant.Color.primaryText),
-                                lineWidth: 1
-                            )
-                    }
-            } placeholder: {
-                PlaceholderImage(size: 150)
-            }
-
+            AvatarImage(avatarURL: userVM.user.avatarURL, size: 150)
             
             CustomizedTextField(
                 placeholder: "Image URL",

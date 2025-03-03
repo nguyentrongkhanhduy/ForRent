@@ -16,7 +16,8 @@ struct Property: Codable, Hashable {
     var bedroom = 0
     var bathroom = 0
     var guest = 0
-    var description = ""
+    var description = "" //short summary
+    var descriptionLong = ""
     var imgURL = ""
     var isAvailable = false
     var isDelisted = false

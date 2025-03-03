@@ -38,22 +38,7 @@ struct ProfileView: View {
                                 ChangeAvatarView()
                             } label: {
                                 HStack {
-                                    AsyncImage(url: URL(string: avatarURL)) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 45, height: 45)
-                                            .clipShape(Circle())
-                                            .overlay {
-                                                Circle()
-                                                    .stroke(
-                                                        Color(Constant.Color.primaryText),
-                                                        lineWidth: 1
-                                                    )
-                                            }
-                                    } placeholder: {
-                                        PlaceholderImage(size: 45)
-                                    }
+                                    AvatarImage(avatarURL: avatarURL, size: 45)
                                     VStack(alignment: .leading) {
                                         Text(userVM.user.username)
                                             .font(

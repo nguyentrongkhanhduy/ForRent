@@ -103,6 +103,9 @@ class LocationVM: NSObject, CLLocationManagerDelegate {
             }
             
             if let placemark = placemarks?.first {
+//                print(placemark.subLocality ?? "unknown district")
+//                print(placemark.locality ?? "unknown city")
+//                print(placemark. ?? "unknown")
                 let city = placemark.locality ?? ""
                 let state = placemark.administrativeArea ?? ""
                 let country = placemark.country ?? ""

@@ -17,12 +17,14 @@ struct ExploreView: View {
     @State private var selectedProperty: Property?
     @State private var showProperty = false
     @State private var showAlert = false
-    @State private var cameraPosition: MapCameraPosition = .region(
+    @State private var defaultCameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 43.6532, longitude: -79.3832), // Toronto
-            span: MKCoordinateSpan(latitudeDelta: 0.07, longitudeDelta: 0.07)
+            center: CLLocationCoordinate2D(latitude: 43.7255, longitude: -79.4523), // Toronto
+            span: MKCoordinateSpan(latitudeDelta: 0.33, longitudeDelta: 0.33)
         )
     )
+    
+    var filterArea: String
     
     private func performGetCurrentLocation() {
         locationVM.requestLocationPermisstion() {
@@ -35,19 +37,34 @@ struct ExploreView: View {
     }
     
     func updateCameraPosition() {
-        if let curPosition = locationVM.userLocation {
-            print(curPosition)
-            DispatchQueue.main.async {
-                cameraPosition = .region(
-                    MKCoordinateRegion(center: curPosition, span: MKCoordinateSpan(latitudeDelta: 0.07, longitudeDelta: 0.07))
-                )
-            }
+        if self.filterArea.isEmpty {
+            return
         }
+        var curLocation = CLLocationCoordinate2D()
+        switch filterArea {
+        case "Toronto":
+            curLocation = Constant.TorontoDistrict.Toronto
+        case "Etobicoke":
+            curLocation = Constant.TorontoDistrict.Etobicoke
+        case "York":
+            curLocation = Constant.TorontoDistrict.York
+        case "East York":
+            curLocation = Constant.TorontoDistrict.EastYork
+        case "North York":
+            curLocation = Constant.TorontoDistrict.NorthYork
+        case "Scarborough":
+            curLocation = Constant.TorontoDistrict.Scarborough
+        default:
+            break
+        }
+        defaultCameraPosition = .region(
+            MKCoordinateRegion(center: curLocation, span: MKCoordinateSpan(latitudeDelta: 0.15, longitudeDelta: 0.15))
+        )
     }
     
     var body: some View {
         ZStack {
-            Map(position: $cameraPosition) {
+            Map(position: $defaultCameraPosition) {
                 ForEach(propertyVM.listProperty, id: \.self) { property in
                     Annotation(
                         "Property",
@@ -67,6 +84,7 @@ struct ExploreView: View {
             .onAppear {
                 performGetCurrentLocation()
                 updateCameraPosition()
+//                print(filterArea.isEmpty ? "notchosen" : filterArea)
             }
             .onChange(
                 of: locationVM.userLocationEquatable
@@ -102,7 +120,7 @@ struct ExploreView: View {
 }
 
 #Preview {
-    ExploreView()
+    ExploreView(filterArea: "")
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
         .environment(PropertyVM.shared)

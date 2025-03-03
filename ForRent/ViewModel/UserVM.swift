@@ -172,4 +172,21 @@ class UserVM {
             }
         }
     }
+    
+    func fetchOwnerInfo(ownerId: String, completion: @escaping (User?) -> Void) {
+        db.collection("users").document(ownerId).getDocument { snapshot, error in
+            if error != nil {
+                completion(nil)
+                return
+            }
+            
+            guard let snapshot = snapshot, snapshot.exists,
+                  let ownerData = try? snapshot.data(as: User.self) else {
+                completion(nil)
+                return
+            }
+            
+            completion(ownerData)
+        }
+    }
 }
