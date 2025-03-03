@@ -8,12 +8,7 @@
 import SwiftUI
 
 struct FilterView: View {
-    @Binding var desiredPrice: String
-    @Binding var  selectedArea: String
-    @Binding var  selectedBed: String
-    @Binding var selectedBath: String
-    @Binding var selectedGuest: String
-    @Binding var selectedDate: Date
+    @Binding var filterCriteria: FilterCriteria
     
     let areaOptions = Constant.PropertyProperties.areaOptions
     let bedroomOptions = Constant.PropertyProperties.bedroomOptions
@@ -21,12 +16,12 @@ struct FilterView: View {
     let guestOptions = Constant.PropertyProperties.guestOptions
 
     private func clearAll() {
-        desiredPrice = ""
-        selectedArea = ""
-        selectedBed = ""
-        selectedBath = ""
-        selectedGuest = ""
-        selectedDate = Date()
+        filterCriteria.desiredPrice = ""
+        filterCriteria.selectedArea = ""
+        filterCriteria.selectedBed = ""
+        filterCriteria.selectedBath = ""
+        filterCriteria.selectedGuest = ""
+        filterCriteria.selectedDate = Date()
     }
     
     let search: () -> Void
@@ -48,7 +43,7 @@ struct FilterView: View {
                             .scaledToFit()
                             .frame(height: 15)
                             .aspectRatio(1, contentMode: .fit)
-                        TextField("0", text: $desiredPrice)
+                        TextField("0", text: $filterCriteria.desiredPrice)
                             .font(.custom(Constant.Font.regular, size: 16))
                             .keyboardType(.decimalPad)
                         Text("/night")
@@ -73,7 +68,7 @@ struct FilterView: View {
                     CustomizedPicker(
                         options: areaOptions,
                         placeholder: "Area",
-                        selectedValue: $selectedArea
+                        selectedValue: $filterCriteria.selectedArea
                     )
                     .padding(.top, -8)
                 }
@@ -86,7 +81,7 @@ struct FilterView: View {
                     
                     DatePicker(
                         "Select a Date",
-                        selection: $selectedDate,
+                        selection: $filterCriteria.selectedDate,
                         in: Date()...,
                         displayedComponents: [.date]
                     )
@@ -106,7 +101,7 @@ struct FilterView: View {
                     CustomizedPicker(
                         options: guestOptions,
                         placeholder: "Guests",
-                        selectedValue: $selectedGuest
+                        selectedValue: $filterCriteria.selectedGuest
                     )
                     .padding(.top, -8)
                 }
@@ -120,13 +115,13 @@ struct FilterView: View {
                         CustomizedPicker(
                             options: bedroomOptions,
                             placeholder: "Bedrooms",
-                            selectedValue: $selectedBed
+                            selectedValue: $filterCriteria.selectedBed
                         )
                         
                         CustomizedPicker(
                             options: bathroomOptions,
                             placeholder: "Bathrooms",
-                            selectedValue: $selectedBath
+                            selectedValue: $filterCriteria.selectedBath
                         )
                     }
                     .padding(.top, -8)
@@ -162,16 +157,6 @@ struct FilterView: View {
 }
 
 #Preview {
-    @Previewable @State var test1 = ""
-    @Previewable @State var test2 = ""
-    @Previewable @State var test3 = ""
-    @Previewable @State var test4 = ""
-    @Previewable @State var test5 = ""
-    @Previewable @State var test6 = Date()
-    FilterView(desiredPrice: $test1,
-               selectedArea: $test2,
-               selectedBed: $test3,
-               selectedBath: $test4,
-               selectedGuest: $test5,
-               selectedDate: $test6) {}
+    @Previewable @State var test7 = FilterCriteria()
+    FilterView(filterCriteria: $test7) {}
 }

@@ -14,14 +14,6 @@ struct ContentView: View {
     @Environment(LocationVM.self) var locationVM
     
     @State private var selectedTab = 0
-    @State private var showSearchTab = false
-    
-    @State private var desiredPrice = ""
-    @State private var selectedArea = ""
-    @State private var selectedBath = ""
-    @State private var selectedBed = ""
-    @State private var selectedGuest = ""
-    @State private var selectedDate = Date()
     
     private var toolBarTitle: String {
         switch selectedTab {
@@ -36,17 +28,6 @@ struct ContentView: View {
         default:
             ""
         }
-    }
-    
-    private func filterListProperty() {
-        print(propertyVM
-            .getFilteredProperties(
-                price: desiredPrice,
-                bath: String(selectedBath.prefix(1)),
-                bed: String(selectedBed.prefix(1)),
-                guest: String(selectedGuest.prefix(1)),
-                date: selectedDate
-            ))
     }
     
     var body: some View {
@@ -83,18 +64,6 @@ struct ContentView: View {
                     Text(self.toolBarTitle)
                         .font(.custom(Constant.Font.semiBold, size: 30))
                         .foregroundStyle(Color(Constant.Color.primaryText))
-                }
-            }
-            .sheet(isPresented: $showSearchTab) {
-                FilterView(
-                    desiredPrice: $desiredPrice,
-                    selectedArea: $selectedArea,
-                    selectedBed: $selectedBed,
-                    selectedBath: $selectedBath,
-                    selectedGuest: $selectedGuest,
-                    selectedDate: $selectedDate
-                ) {
-                    showSearchTab = false
                 }
             }
         }//End of NavStack

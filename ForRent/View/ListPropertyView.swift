@@ -17,14 +17,7 @@ struct ListPropertyView: View {
     @State private var showDetailView = false
     @State private var selectedProperty: Property?
     @State private var showSearchTab = false
-    
-    @State private var desiredPrice = ""
-    @State private var selectedArea = ""
-    @State private var selectedBath = ""
-    @State private var selectedBed = ""
-    @State private var selectedGuest = ""
-    @State private var selectedDate = Date()
-    
+    @State private var filterCriteria = FilterCriteria()
     
     var body: some View {
         NavigationStack {
@@ -39,11 +32,11 @@ struct ListPropertyView: View {
                         ForEach(
                             propertyVM
                                 .getFilteredProperties(
-                                    price: desiredPrice,
-                                    bath: selectedBath,
-                                    bed: selectedBed,
-                                    guest: selectedGuest,
-                                    date: selectedDate
+                                    price: filterCriteria.desiredPrice,
+                                    bath: filterCriteria.selectedBath,
+                                    bed: filterCriteria.selectedBed,
+                                    guest: filterCriteria.selectedGuest,
+                                    date: filterCriteria.selectedDate
                                 ),
                             id: \.self
                         ) { property in
@@ -61,7 +54,7 @@ struct ListPropertyView: View {
                     }
                     .scrollContentBackground(.hidden)
                     .background(Color.clear)
-                    .padding(.bottom)
+                    .padding(.bottom, 40)
                 }
                 
                 VStack {
@@ -73,17 +66,10 @@ struct ListPropertyView: View {
                 }
             }// end of zstack
             .sheet(isPresented: $showMap) {
-                ExploreView(filterArea: selectedArea)
+                ExploreView(filterArea: filterCriteria.selectedArea)
             }
             .sheet(isPresented: $showSearchTab) {
-                FilterView(
-                    desiredPrice: $desiredPrice,
-                    selectedArea: $selectedArea,
-                    selectedBed: $selectedBed,
-                    selectedBath: $selectedBath,
-                    selectedGuest: $selectedGuest,
-                    selectedDate: $selectedDate
-                ) {
+                FilterView(filterCriteria: $filterCriteria) {
                     showSearchTab = false
                 }
             }
@@ -92,7 +78,6 @@ struct ListPropertyView: View {
                     PropertyDetailView(property: property)
                 }
             }
-            .toolbarBackground(.white, for: .tabBar)
         }// end of navstack
         
     }

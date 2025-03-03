@@ -79,12 +79,11 @@ struct ExploreView: View {
                 
             }
             .mapControls {
-                MapUserLocationButton()
+//                MapUserLocationButton()
             }
             .onAppear {
-                performGetCurrentLocation()
+//                performGetCurrentLocation() //get user permission
                 updateCameraPosition()
-//                print(filterArea.isEmpty ? "notchosen" : filterArea)
             }
             .onChange(
                 of: locationVM.userLocationEquatable
