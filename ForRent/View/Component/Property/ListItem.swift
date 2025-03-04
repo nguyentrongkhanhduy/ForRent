@@ -18,26 +18,7 @@ struct ListItem: View {
     var body: some View {
         ZStack {
             VStack {
-                AsyncImage(
-                    url: URL(
-                        string: property.imgURL
-                    )
-                ) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .clipped()
-                        .frame(width: 350, height: 350)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                    
-                } placeholder: {
-                    Image("house-placeholder")
-                        .resizable()
-                        .scaledToFill()
-                        .clipped()
-                        .frame(width: 350, height: 350)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
+                SquareImage(imgURL: property.imgURL, size: 350, radius: 10)
                 
                 VStack(alignment: .leading) {
                     Text(property.title)
@@ -46,10 +27,7 @@ struct ListItem: View {
                     Text(cityStateCountry)
                         .font(.custom(Constant.Font.regular, size: 14))
                         .foregroundStyle(Color(Constant.Color.sencondaryText))
-                    Text(property.description)
-                        .font(.custom(Constant.Font.regular, size: 14))
-                        .foregroundStyle(Color(Constant.Color.sencondaryText))
-                    Text("Available: \(property.getFormattedDate(type: "available"))")
+                    Text("\(property.dateAvailable.getShortMonthDayFormat())")
                         .font(.custom(Constant.Font.regular, size: 14))
                         .foregroundStyle(Color(Constant.Color.sencondaryText))
                     HStack(alignment: .lastTextBaseline) {
@@ -71,12 +49,12 @@ struct ListItem: View {
             HStack {
                 Spacer()
                 
-                FavouriteButton {
+                FavouriteButton(property: property) {
                     addtoWishlist()
                 }
             }
-            .padding(.trailing)
-            .padding(.bottom, 430)
+            .padding(.trailing, 14)
+            .padding(.bottom, 420)
             .frame(width: 350)
             .zIndex(2)
         }

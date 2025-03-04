@@ -16,8 +16,7 @@ struct Property: Codable, Hashable {
     var bedroom = 0
     var bathroom = 0
     var guest = 0
-    var description = "" //short summary
-    var descriptionLong = ""
+    var description = ""
     var imgURL = ""
     var isAvailable = false
     var isDelisted = false
@@ -33,19 +32,24 @@ struct Property: Codable, Hashable {
             longitude: coordinate.longitude
         )
     }
+}
+
+extension Date {
+    func getShortMonthDayFormat() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM dd"
+        return formatter.string(from: self)
+    }
     
-    func getFormattedDate(type: String) -> String { //type:String = add/update/available
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        switch type {
-        case "add":
-            return dateFormatter.string(from: self.dateAdded)
-        case "update":
-            return dateFormatter.string(from: self.dateUpdated)
-        case "available":
-            return dateFormatter.string(from: self.dateAvailable)
-        default:
-            return ""
-        }
+    func getFullFormatDate() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy MMMM dd"
+        return formatter.string(from: self)
+    }
+
+    func getShortestMonthDayFormat() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd"
+        return formatter.string(from: self)
     }
 }

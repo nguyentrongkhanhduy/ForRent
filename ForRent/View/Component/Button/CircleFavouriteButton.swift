@@ -2,12 +2,12 @@
 //  FavouriteButton.swift
 //  ForRent
 //
-//  Created by Eddie Nguyen on 2025-03-03.
+//  Created by Eddie Nguyen on 2025-03-01.
 //
 
 import SwiftUI
 
-struct FavouriteButton: View {
+struct CircleFavouriteButton: View {
     @Environment(AuthenticationVM.self) var authenticationVM
     @Environment(UserVM.self) var userVM
     
@@ -28,20 +28,17 @@ struct FavouriteButton: View {
         Button {
             action()
         } label: {
-            Image(systemName: "heart.fill")
+            Image(systemName: isInWishlist ? "heart.fill" : "heart")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 18, height: 18)
+                .frame(width: 13.5, height: 13.5)
+                .padding(7)
+                .background(Circle()
+                    .fill(Color.white)
+                    .stroke(Color(Constant.Color.subText), lineWidth: 1))
                 .foregroundColor(isInWishlist ?
                                  Color(Constant.Color.primaryColor) :
                                     Color(Constant.Color.sencondaryText)
-                )
-                .background(
-                    Image(systemName: "heart")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 21, height: 21)
-                        .foregroundStyle(.white)
                 )
         }
         .buttonStyle(.plain)
@@ -58,8 +55,8 @@ struct FavouriteButton: View {
 
 //#Preview {
 //    FavouriteButton() {}
-//            .environment(AuthenticationVM.shared)
-//            .environment(UserVM.shared)
-//            .environment(PropertyVM.shared)
-//            .environment(LocationVM.shared)
+//        .environment(AuthenticationVM.shared)
+//        .environment(UserVM.shared)
+//        .environment(PropertyVM.shared)
+//        .environment(LocationVM.shared)
 //}

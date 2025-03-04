@@ -135,7 +135,7 @@ struct PropertyDetailView: View {
                                 .font(.custom(Constant.Font.semiBold, size: 20))
                                 .foregroundStyle(Color(Constant.Color.primaryText))
                                 .padding(.bottom)
-                            Text("Long Description goes here")
+                            Text(property.description)
                                 .font(.custom(Constant.Font.regular, size: 14))
                                 .foregroundStyle(Color(Constant.Color.primaryText))
                         }
@@ -194,7 +194,7 @@ struct PropertyDetailView: View {
                             Text("Availability")
                                 .font(.custom(Constant.Font.semiBold, size: 20))
                                 .foregroundStyle(Color(Constant.Color.primaryText))
-                            Text(property.getFormattedDate(type: "available"))
+                            Text(property.dateAvailable.getFullFormatDate())
                                 .font(.custom(Constant.Font.regular, size: 14))
                                 .foregroundStyle(
                                     Color(Constant.Color.sencondaryText)
@@ -227,7 +227,9 @@ struct PropertyDetailView: View {
                                         )
                                         .foregroundStyle(Color(Constant.Color.primaryText))
                                 }
-                                Text(property.getFormattedDate(type: "available"))
+                                Text(
+                                    property.dateAvailable.getShortMonthDayFormat()
+                                )
                                     .font(.custom(Constant.Font.regular, size: 14))
                                     .foregroundStyle(
                                         Color(Constant.Color.primaryText)

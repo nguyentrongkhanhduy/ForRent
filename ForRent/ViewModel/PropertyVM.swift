@@ -77,4 +77,17 @@ class PropertyVM {
                 && (date <= property.dateAvailable)
             }
         }
+    
+    func getWishlistProperties(wishList: [String]) -> [Property] {
+        return listProperty.filter { property in
+            guard let propertyId = property.id else {
+                return false
+            }
+            return wishList.contains { id in
+                propertyId == id
+            }
+        }
+    }
 }
+
+

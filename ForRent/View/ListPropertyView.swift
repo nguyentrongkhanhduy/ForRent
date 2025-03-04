@@ -18,6 +18,25 @@ struct ListPropertyView: View {
     @State private var selectedProperty: Property?
     @State private var showSearchTab = false
     @State private var filterCriteria = FilterCriteria()
+    @State private var showLoginAlert = false
+    @State private var toLogin = false
+    
+    @Binding var tab: Int
+    
+    private func performAddToWishList(property: Property) {
+        if authenticationVM.isLoggedIn {
+            guard let propId = property.id else {
+                print("Error adding to wishlist")
+                return
+            }
+            userVM
+                .addOrRemoveToWishList(
+                    userId: authenticationVM.userID,
+                    propertyId: propId)
+        } else {
+            showLoginAlert = true
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -41,7 +60,7 @@ struct ListPropertyView: View {
                             id: \.self
                         ) { property in
                             ListItem(property: property) {
-                                print(property.title)
+                                performAddToWishList(property: property)
                             }
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
@@ -54,7 +73,7 @@ struct ListPropertyView: View {
                     }
                     .scrollContentBackground(.hidden)
                     .background(Color.clear)
-                    .padding(.bottom, 40)
+                    .padding(.bottom)
                 }
                 
                 VStack {
@@ -62,11 +81,11 @@ struct ListPropertyView: View {
                     MapButton {
                         showMap = true
                     }
-                    .padding(.bottom,40)
+                    .padding(.bottom, 25)
                 }
             }// end of zstack
             .sheet(isPresented: $showMap) {
-                ExploreView(filterArea: filterCriteria.selectedArea)
+                ExploreView(filterArea: filterCriteria.selectedArea, tab: $tab)
             }
             .sheet(isPresented: $showSearchTab) {
                 FilterView(filterCriteria: $filterCriteria) {
@@ -78,13 +97,25 @@ struct ListPropertyView: View {
                     PropertyDetailView(property: property)
                 }
             }
+            .navigationDestination(isPresented: $toLogin, destination: {
+                LoginView(tab: $tab)
+            })
+            .alert("Action Requires an Account", isPresented: $showLoginAlert) {
+                Button("Log In") {
+                    toLogin = true
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("You need to have an account to perform this action. Please log in or sign up.")
+            }
         }// end of navstack
         
     }
 }
 
 #Preview {
-    ListPropertyView()
+    @Previewable @State var test = 1
+    ListPropertyView(tab: $test)
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
         .environment(PropertyVM.shared)

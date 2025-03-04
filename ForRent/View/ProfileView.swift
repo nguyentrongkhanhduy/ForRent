@@ -194,7 +194,10 @@ struct ProfileView: View {
                         
                         VStack {
                             Spacer()
-                            MoreRoundedButton(text: "Switch to hosting") {
+                            MoreRoundedButton(
+                                text: "Switch to hosting",
+                                systemImgString: "arrow.trianglehead.swap"
+                            ) {
                                 
                             }
                         }//top layer button

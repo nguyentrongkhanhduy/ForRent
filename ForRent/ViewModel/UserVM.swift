@@ -189,4 +189,32 @@ class UserVM {
             completion(ownerData)
         }
     }
+    
+    func addOrRemoveToWishList(userId: String, propertyId: String) {
+        let userRef = db.collection("users").document(userId)
+        
+        if user.wishList.contains(propertyId) {
+                userRef.updateData([
+                    "wishList": FieldValue.arrayRemove([propertyId])
+                ]) { error in
+                    if let error = error {
+                        print("Error removing property from wishlist: \(error.localizedDescription)")
+                    } else {
+                        print("Successfully removed property \(propertyId) from wishlist")
+                        self.user.wishList.removeAll { $0 == propertyId }
+                    }
+                }
+            } else {
+                userRef.updateData([
+                    "wishList": FieldValue.arrayUnion([propertyId])
+                ]) { error in
+                    if let error = error {
+                        print("Error adding property to wishlist: \(error.localizedDescription)")
+                    } else {
+                        print("Successfully added property \(propertyId) to wishlist")
+                        self.user.wishList.append(propertyId)
+                    }
+                }
+            }
+    }
 }

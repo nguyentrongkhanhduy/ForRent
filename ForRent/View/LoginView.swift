@@ -16,6 +16,7 @@ struct LoginView: View {
     
     @State private var password: String = ""
     @State private var showAlert: Bool = false
+    @State private var toSignUp = false
     
     @AppStorage("rememberMe") private var rememberCredential: Bool = false
     @AppStorage("savedEmail") private var savedEmail: String = ""
@@ -49,66 +50,88 @@ struct LoginView: View {
             }
         }
     }
-    
+        
     var body: some View {
-        VStack {
-            Text("Log in to ForRent")
-                .font(.custom(Constant.Font.semiBold, size: 20))
-                .foregroundStyle(Color(Constant.Color.primaryText))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, 10)
-            
-            CustomizedTextField(
-                placeholder: "Email",
-                isSecure: false,
-                bindingText: Binding(get: {
-                    authenticationVM.email
-                }, set: { value in
-                    authenticationVM.email = value
-                })
-            )
-                .keyboardType(.emailAddress)
-                .padding(.top, 50)
-            
-            CustomizedTextField(
-                placeholder: "Password",
-                isSecure: true,
-                bindingText: $password
-            )
-                .padding(.top, 10)
-            
-            HStack {
-                Button {
-                    rememberCredential.toggle()
-                } label: {
-                    Image(systemName: rememberCredential ? "checkmark.square.fill" : "square")
-                        .resizable()
-                        .frame(width: 14, height: 14)
-                        .foregroundColor(Color(Constant.Color.primaryText))
-                    
-                    Text("Remember me")
-                        .font(.custom(Constant.Font.regular, size: 14))
-                        .foregroundStyle(Color(Constant.Color.primaryText))
+        NavigationStack {
+            VStack {
+                Text("Log in to ForRent")
+                    .font(.custom(Constant.Font.semiBold, size: 20))
+                    .foregroundStyle(Color(Constant.Color.primaryText))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 10)
+                
+                CustomizedTextField(
+                    placeholder: "Email",
+                    isSecure: false,
+                    bindingText: Binding(get: {
+                        authenticationVM.email
+                    }, set: { value in
+                        authenticationVM.email = value
+                    })
+                )
+                    .keyboardType(.emailAddress)
+                    .padding(.top, 50)
+                
+                CustomizedTextField(
+                    placeholder: "Password",
+                    isSecure: true,
+                    bindingText: $password
+                )
+                    .padding(.top, 10)
+                
+                HStack {
+                    Button {
+                        rememberCredential.toggle()
+                    } label: {
+                        Image(systemName: rememberCredential ? "checkmark.square.fill" : "square")
+                            .resizable()
+                            .frame(width: 14, height: 14)
+                            .foregroundColor(Color(Constant.Color.primaryText))
+                        
+                        Text("Remember me")
+                            .font(.custom(Constant.Font.regular, size: 14))
+                            .foregroundStyle(Color(Constant.Color.primaryText))
+                    }
                 }
+                .padding(.top, 5)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                PrimaryButton(text: "Log in") {
+                    performLogin()
+                }
+                .padding(.top, 10)
+               
+                
+                HStack {
+                    Text("Don't have an account?")
+                        .font(.custom(Constant.Font.regular, size: 15))
+                    Button {
+    //                    toSignup()
+                        toSignUp = true
+                    } label: {
+                        Text("Sign up")
+                            .font(.custom(Constant.Font.semiBold, size: 15))
+                            .underline()
+                    }
+                }
+                .foregroundStyle(Color(Constant.Color.primaryText))
+                
+                Spacer()
+            }//End of VStack
+            .onAppear() {
+                loadSavedCredentials()
             }
-            .padding(.top, 5)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            PrimaryButton(text: "Log in") {
-                performLogin()
+            .padding(.horizontal)
+            .alert("Error", isPresented: $showAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(authenticationVM.errorMessage)
             }
-            .padding(.top, 10)
-            Spacer()
-        }//End of VStack
-        .onAppear() {
-            loadSavedCredentials()
+            .navigationDestination(isPresented: $toSignUp) {
+                SignupView(tab: $tab)
+            }
         }
-        .padding(.horizontal)
-        .alert("Error", isPresented: $showAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(authenticationVM.errorMessage)
-        }
+        
 
     }
 }

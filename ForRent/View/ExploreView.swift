@@ -23,8 +23,12 @@ struct ExploreView: View {
             span: MKCoordinateSpan(latitudeDelta: 0.33, longitudeDelta: 0.33)
         )
     )
+    @State private var showLoginAlert = false
+    @State private var toLogin = false
     
     var filterArea: String
+    
+    @Binding var tab: Int
     
     private func performGetCurrentLocation() {
         locationVM.requestLocationPermisstion() {
@@ -62,64 +66,94 @@ struct ExploreView: View {
         )
     }
     
-    var body: some View {
-        ZStack {
-            Map(position: $defaultCameraPosition) {
-                ForEach(propertyVM.listProperty, id: \.self) { property in
-                    Annotation(
-                        "Property",
-                        coordinate: property.coordinate2D) {
-                            CustomizedMarker(price: property.price)
-                                .onTapGesture {
-                                    showProperty = true
-                                    selectedProperty = property
-                                }
-                        }
-                }
-                
+    private func performAddToWishList(property: Property) {
+        if authenticationVM.isLoggedIn {
+            guard let propId = property.id else {
+                print("Error adding to wishlist")
+                return
             }
-            .mapControls {
-//                MapUserLocationButton()
-            }
-            .onAppear {
-//                performGetCurrentLocation() //get user permission
-                updateCameraPosition()
-            }
-            .onChange(
-                of: locationVM.userLocationEquatable
-            ) { _, _ in
-                updateCameraPosition()
-            }
-            .alert("Location Permission Needed", isPresented: $showAlert, actions: {
-                Button("OK", role: .cancel) { }
-            }, message: {
-                Text(locationVM.errorMessage)
-            })
-//            .onTapGesture {
-//                if showProperty {
-//                    showProperty = false
-//                }
-//            }
-            .presentationDetents([.height(900), .large])
-            
-            if showProperty, let property = selectedProperty {
-                VStack {
-                    Spacer()
-                    PopupProperty(
-                        property: property) {
-                            
-                        } close: {
-                            showProperty = false
-                        }
-                        .zIndex(1)
-                }
-            }
+            userVM
+                .addOrRemoveToWishList(
+                    userId: authenticationVM.userID,
+                    propertyId: propId)
+        } else {
+            showLoginAlert = true
         }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Map(position: $defaultCameraPosition) {
+                    ForEach(propertyVM.listProperty, id: \.self) { property in
+                        Annotation(
+                            "Property",
+                            coordinate: property.coordinate2D) {
+                                CustomizedMarker(price: property.price)
+                                    .onTapGesture {
+                                        showProperty = true
+                                        selectedProperty = property
+                                    }
+                            }
+                    }
+                    
+                }
+                .mapControls {
+    //                MapUserLocationButton()
+                }
+                .onAppear {
+    //                performGetCurrentLocation() //get user permission
+                    updateCameraPosition()
+                }
+                .onChange(
+                    of: locationVM.userLocationEquatable
+                ) { _, _ in
+                    updateCameraPosition()
+                }
+                .alert("Location Permission Needed", isPresented: $showAlert, actions: {
+                    Button("OK", role: .cancel) { }
+                }, message: {
+                    Text(locationVM.errorMessage)
+                })
+    //            .onTapGesture {
+    //                if showProperty {
+    //                    showProperty = false
+    //                }
+    //            }
+                
+                if showProperty, let property = selectedProperty {
+                    VStack {
+                        Spacer()
+                        PopupProperty(
+                            property: property) {
+                                performAddToWishList(property: property)
+                            } close: {
+                                showProperty = false
+                            }
+                            .zIndex(1)
+                    }
+                    
+                }
+            }//end of ZStack
+            .navigationDestination(isPresented: $toLogin, destination: {
+                LoginView(tab: $tab)
+            })
+            .alert("Action Requires an Account", isPresented: $showLoginAlert) {
+                Button("Log In") {
+                    toLogin = true
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("You need to have an account to perform this action. Please log in or sign up.")
+            }
+        }//end of Navstack
+       
     }
 }
 
 #Preview {
-    ExploreView(filterArea: "")
+    @Previewable @State var test = 1
+    ExploreView(filterArea: "", tab: $test)
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
         .environment(PropertyVM.shared)

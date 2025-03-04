@@ -33,7 +33,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             TabView(selection: $selectedTab) {
-                ListPropertyView()
+                ListPropertyView(tab: self.$selectedTab)
                     .tabItem {
                         Label("Explore", systemImage: "magnifyingglass")
                     }

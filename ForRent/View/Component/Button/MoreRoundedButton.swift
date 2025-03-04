@@ -9,25 +9,29 @@ import SwiftUI
 
 struct MoreRoundedButton: View {
     var text: String
+    var systemImgString: String
     var action: () -> Void
     
     var body: some View {
         Button {
             action()
         } label: {
-            Text(text)
-                .font(.custom(Constant.Font.semiBold, size: 20))
-                .padding()
-                .foregroundStyle(Color.white)
-                .frame(width: 250)
-                .background(
-                    RoundedRectangle(cornerRadius: 30)
-                        .fill(Color(Constant.Color.primaryText))
-                )
+            HStack {
+                Image(systemName: systemImgString)
+                Text(text)
+                    .font(.custom(Constant.Font.semiBold, size: 18))
+            }
+            .padding()
+            .padding(.horizontal)
+            .foregroundStyle(Color.white)
+            .background(
+                RoundedRectangle(cornerRadius: 30)
+                    .fill(Color(Constant.Color.primaryText))
+            )
         }
     }
 }
 
 #Preview {
-    MoreRoundedButton(text: "Switch to Host", action: {})
+    MoreRoundedButton(text: "Switch to hosting", systemImgString: "arrow.trianglehead.swap", action: {})
 }

@@ -37,7 +37,7 @@ struct PopupProperty: View {
                     HStack {
                         Spacer()
                         
-                        FavouriteButton {
+                        CircleFavouriteButton(property: property) {
                             addtoWishlist()
                         }
                         
@@ -67,7 +67,7 @@ struct PopupProperty: View {
                 .font(.custom(Constant.Font.semiBold, size: 16))
                 .foregroundStyle(Color(Constant.Color.primaryText))
             
-            Text(property.getFormattedDate(type: "available"))
+            Text(property.dateAvailable.getShortestMonthDayFormat())
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
                 .font(.custom(Constant.Font.regular, size: 14))
