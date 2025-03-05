@@ -10,17 +10,44 @@ import SwiftUI
 struct WishlistView: View {
     @Environment(AuthenticationVM.self) var authenticationVM
     @Environment(UserVM.self) var userVM
+    @Environment(PropertyVM.self) var propertyVM
     
     @State private var toLoginScreen = false
     @State private var toSignupScreen = false
+    @State private var toDetailView = false
     
     @Binding var tab: Int
+    
+    let columns = [
+        GridItem(.flexible(), spacing: 10, alignment: .top),
+        GridItem(.flexible(), spacing: 10, alignment: .top)
+    ]
+    
+    private func performAddToWishList(property: Property) {
+            guard let propId = property.id else {
+                print("Error adding to wishlist")
+                return
+            }
+            userVM
+                .addOrRemoveToWishList(
+                    userId: authenticationVM.userID,
+                    propertyId: propId)
+    }
     
     var body: some View {
         NavigationStack {
             VStack {
                 if authenticationVM.isLoggedIn {
-                    
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 15) {
+                            ForEach(propertyVM.getWishlistProperties(wishList: userVM.user.wishList), id:\.self) { property in
+                                WishlistItem(property: property) {
+                                    performAddToWishList(property: property)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical, 30)
                 } else {
                     TemporaryViewForLogin(screenId: 1) {
                         toLoginScreen = true
