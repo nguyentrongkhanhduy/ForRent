@@ -15,6 +15,7 @@ struct WishlistView: View {
     @State private var toLoginScreen = false
     @State private var toSignupScreen = false
     @State private var toDetailView = false
+    @State private var selectProperty: Property?
     
     @Binding var tab: Int
     
@@ -44,7 +45,12 @@ struct WishlistView: View {
                                 WishlistItem(property: property) {
                                     performAddToWishList(property: property)
                                 }
+                                .onTapGesture {
+                                    toDetailView = true
+                                    selectProperty = property
+                                }
                             }
+
                         }
                     }
                     .padding(.vertical, 30)
@@ -62,6 +68,11 @@ struct WishlistView: View {
             }
             .navigationDestination(isPresented: $toSignupScreen) {
                 SignupView(tab: self.$tab)
+            }
+            .navigationDestination(isPresented: $toDetailView) {
+                if let property = selectProperty {
+                    PropertyDetailView(property: property, tab: self.$tab)
+                }
             }
         }//End of NavStack
     }//End of body

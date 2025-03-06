@@ -9,6 +9,8 @@ import SwiftUI
 import MapKit
 
 struct ExploreView: View {
+    @Environment(\.dismiss) var dismiss
+    
     @Environment(AuthenticationVM.self) var authenticationVM
     @Environment(UserVM.self) var userVM
     @Environment(PropertyVM.self) var propertyVM
@@ -25,6 +27,7 @@ struct ExploreView: View {
     )
     @State private var showLoginAlert = false
     @State private var toLogin = false
+    @State private var showDetailView = false
     
     var filterArea: String
     
@@ -130,6 +133,9 @@ struct ExploreView: View {
                             } close: {
                                 showProperty = false
                             }
+                            .onTapGesture {
+                                showDetailView = true
+                            }
                             .zIndex(1)
                     }
                     
@@ -138,6 +144,11 @@ struct ExploreView: View {
             .navigationDestination(isPresented: $toLogin, destination: {
                 LoginView(tab: $tab)
             })
+            .navigationDestination(isPresented: $showDetailView, destination: {
+                if let property = selectedProperty {
+                    PropertyDetailView(property: property, tab: $tab)
+                }
+            })
             .alert("Action Requires an Account", isPresented: $showLoginAlert) {
                 Button("Log In") {
                     toLogin = true
@@ -145,6 +156,19 @@ struct ExploreView: View {
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("You need to have an account to perform this action. Please log in or sign up.")
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: "chevron.backward")
+                            Text("Back")
+                        }
+                        .foregroundStyle(Color(Constant.Color.primaryText))
+                    }
+                }
             }
         }//end of Navstack
        

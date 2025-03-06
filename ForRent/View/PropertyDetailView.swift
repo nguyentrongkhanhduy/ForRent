@@ -23,8 +23,44 @@ struct PropertyDetailView: View {
         )
     )
     @State private var amenities = ""
+    @State private var isInWishlist: Bool = false
+    @State private var showLoginAlert = false
+    @State private var toLogin = false
+    @State private var toRequest = false
     
     var property: Property
+    @Binding var tab: Int
+    
+    private func navigateToRequestView() {
+        if authenticationVM.isLoggedIn {
+            toRequest = true
+        } else {
+            showLoginAlert = true
+        }
+    }
+    
+    private func performAddToWishList(property: Property) {
+        if authenticationVM.isLoggedIn {
+            guard let propId = property.id else {
+                print("Error adding to wishlist")
+                return
+            }
+            userVM
+                .addOrRemoveToWishList(
+                    userId: authenticationVM.userID,
+                    propertyId: propId)
+        } else {
+            showLoginAlert = true
+        }
+    }
+    
+    private func updateWishlistState() {
+        guard authenticationVM.isLoggedIn, let propertyId = property.id else {
+            isInWishlist = false
+            return
+        }
+        isInWishlist = userVM.user.wishList.contains(propertyId)
+    }
     
     private func fetchPropertyInfo() {
         
@@ -209,7 +245,12 @@ struct PropertyDetailView: View {
                         fetchPropertyInfo()
                     }
                 }
-                
+                .navigationDestination(isPresented: $toRequest) {
+                    RequestView()
+                }
+                .navigationDestination(isPresented: $toLogin) {
+                    LoginView(tab: $tab)
+                }
                 VStack {
                     Spacer()
                     VStack {
@@ -230,15 +271,15 @@ struct PropertyDetailView: View {
                                 Text(
                                     property.dateAvailable.getShortMonthDayFormat()
                                 )
-                                    .font(.custom(Constant.Font.regular, size: 14))
-                                    .foregroundStyle(
-                                        Color(Constant.Color.primaryText)
-                                    )
+                                .font(.custom(Constant.Font.regular, size: 14))
+                                .foregroundStyle(
+                                    Color(Constant.Color.primaryText)
+                                )
                             }
                             
                             Spacer()
                             MoreRoundedPrimaryButton(text: "Request") {
-                                
+                                navigateToRequestView()
                             }
                         }
                         .padding(.horizontal)
@@ -262,18 +303,37 @@ struct PropertyDetailView: View {
                         }
                         
                         Button {
-                            
+                            performAddToWishList(property: property)
                         } label: {
-                            Image(systemName: "heart")
+                            Image(systemName: isInWishlist ? "heart.fill" : "heart")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 16)
-                                .foregroundStyle(Color(Constant.Color.primaryText))
+                                .foregroundStyle(isInWishlist ?
+                                                 Color(Constant.Color.primaryColor) :
+                                                    Color(Constant.Color.sencondaryText)
+                                )
+                        }
+                        .onAppear {
+                            updateWishlistState()
+                        }
+                        .onChange(of: userVM.user.wishList) { oldValue, newValue in
+                            updateWishlistState()
                         }
                     }
                 }
+                
             }
             .toolbarBackground(.white, for: .automatic)
+            
+            .alert("Action Requires an Account", isPresented: $showLoginAlert) {
+                Button("Log In") {
+                    toLogin = true
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("You need to have an account to perform this action. Please log in or sign up.")
+            }
         }//end of NavStack
         
     }

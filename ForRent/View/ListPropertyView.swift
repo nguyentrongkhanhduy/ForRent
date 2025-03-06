@@ -84,9 +84,9 @@ struct ListPropertyView: View {
                     .padding(.bottom, 25)
                 }
             }// end of zstack
-            .sheet(isPresented: $showMap) {
+            .fullScreenCover(isPresented: $showMap, content: {
                 ExploreView(filterArea: filterCriteria.selectedArea, tab: $tab)
-            }
+            })
             .sheet(isPresented: $showSearchTab) {
                 FilterView(filterCriteria: $filterCriteria) {
                     showSearchTab = false
@@ -94,7 +94,7 @@ struct ListPropertyView: View {
             }
             .navigationDestination(isPresented: $showDetailView) {
                 if let property = selectedProperty {
-                    PropertyDetailView(property: property)
+                    PropertyDetailView(property: property, tab: $tab)
                 }
             }
             .navigationDestination(isPresented: $toLogin, destination: {
