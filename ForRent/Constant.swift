@@ -37,4 +37,11 @@ struct Constant {
         static let Etobicoke = CLLocationCoordinate2D(latitude: 43.6205, longitude: -79.5132) 
         static let Scarborough = CLLocationCoordinate2D(latitude: 43.7764, longitude: -79.2318)
     }
+    
+    struct Rules {
+        static let statement = "We ask every guest to remember a few simple things about what makes a great guest"
+        static let ruleOne = "- Follow the house rules"
+        static let ruleTwo = "- Treat your Host's home like your own"
+        static let agree = "By selecting the button below, I agree  to the Host's House Rules, Ground rules for guests, ForRent's Rebooking and Refund Poilicu, and that ForRent can charge my payment method if I'm responsible for damage."
+    }
 }

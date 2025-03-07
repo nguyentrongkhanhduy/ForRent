@@ -246,7 +246,7 @@ struct PropertyDetailView: View {
                     }
                 }
                 .navigationDestination(isPresented: $toRequest) {
-                    RequestView()
+                    RequestView(property: property)
                 }
                 .navigationDestination(isPresented: $toLogin) {
                     LoginView(tab: $tab)

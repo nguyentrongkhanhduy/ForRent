@@ -32,6 +32,26 @@ struct Property: Codable, Hashable {
             longitude: coordinate.longitude
         )
     }
+    
+    func getSubTotal(days: Int) -> Double {
+        return self.price * Double(days)
+    }
+    
+    func getCleaningFee(days: Int) -> Double {
+        return getSubTotal(days: days) * 3 / 100
+    }
+    
+    func getServiceFee(days: Int) -> Double {
+        return self.getSubTotal(days: days) * 4 / 100
+    }
+    
+    func getTax(days: Int) -> Double {
+        return self.getSubTotal(days: days) * 13 / 100
+    }
+    
+    func getFinalTotal(days: Int) -> Double {
+        return getSubTotal(days: days) + getServiceFee(days: days) + getTax(days: days) + getCleaningFee(days: days)
+    }
 }
 
 extension Date {

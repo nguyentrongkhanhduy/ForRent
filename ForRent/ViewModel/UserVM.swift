@@ -53,6 +53,10 @@ class UserVM {
         return "\(user.cardNumber.prefix(1))\(asteriskString)\(user.cardNumber.suffix(1))"
     }
     
+    func maskPhoneNumber() -> String {
+        return "Empty"
+    }
+    
     func setUserIDandEmail(uid: String, email: String) -> Bool {
         if !uid.isEmpty && !email.isEmpty {
             self.user.id = uid
