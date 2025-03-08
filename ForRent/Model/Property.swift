@@ -18,15 +18,15 @@ struct Property: Codable, Hashable {
     var guest = 0
     var description = ""
     var imgURL = ""
-    var isAvailable = false
-    var isDelisted = false
+    var isAvailable = true //-> false when approve request
+    var isDelisted = false // only for owner to see when delisted = true -> user cannot see
     var price = 0.0
-    var coordinate: GeoPoint = GeoPoint(latitude: 0.0, longitude: 0.0)
+    var coordinate: GeoPoint = GeoPoint(latitude: 0.0, longitude: 0.0) //firebase type
     var dateAdded: Date = Date()
     var dateUpdated: Date = Date()
-    var dateAvailable: Date = Date()
+    var dateAvailable: Date = Date() //update to the dateEnd when request approve
     
-    var coordinate2D: CLLocationCoordinate2D {
+    var coordinate2D: CLLocationCoordinate2D { //geocoder
         return CLLocationCoordinate2D(
             latitude: coordinate.latitude,
             longitude: coordinate.longitude

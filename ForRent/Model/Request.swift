@@ -14,7 +14,7 @@ struct Request: Codable, Hashable {
     var ownerId = ""
     var propertyId = ""
     var dateRequest = Date()
-    var dateBegin = Date()
-    var dateEnd = Date()
-    var status = "" //Pending/Approved/Denied/Cancelled
+    var dateBegin = Date() //= initial available date set by owner
+    var dateEnd = Date() //set by the user
+    var status = "" //Pending/ Approved/Denied/  cancelled
 }

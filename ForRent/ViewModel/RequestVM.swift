@@ -93,7 +93,7 @@ class RequestVM {
         db.collection("requests").document(requestId).updateData([
             "status" : "Cancelled"
         ]) { error in
-            if let unwrappedError = error {
+            if error != nil {
                 completion(false)
             } else {
                 completion(true)

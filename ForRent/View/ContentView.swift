@@ -15,6 +15,8 @@ struct ContentView: View {
     
     @State private var selectedTab = 0
     
+    @AppStorage("currentRole") private var currentRole = "Guest"
+    
     private var toolBarTitle: String {
         switch selectedTab {
         case 0:
@@ -25,6 +27,8 @@ struct ContentView: View {
             "Messages"
         case 3:
             "Profile"
+        case 4:
+            "Your listing"
         default:
             ""
         }
@@ -33,17 +37,26 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             TabView(selection: $selectedTab) {
-                ListPropertyView(tab: self.$selectedTab)
-                    .tabItem {
-                        Label("Explore", systemImage: "magnifyingglass")
-                    }
-                    .tag(0)
+                if authenticationVM.isLoggedIn == false || currentRole == "Guest"  {
+                    ListPropertyView(tab: self.$selectedTab)
+                        .tabItem {
+                            Label("Explore", systemImage: "magnifyingglass")
+                        }
+                        .tag(0)
+                    
+                    WishlistView(tab: self.$selectedTab)
+                        .tabItem {
+                            Label("Wishlist", systemImage: "heart")
+                        }
+                        .tag(1)
+                } else {
+                    ListingView(tab: self.$selectedTab)
+                        .tabItem {
+                            Label("Listing", systemImage: "house")
+                        }
+                        .tag(4)
+                }
                 
-                WishlistView(tab: self.$selectedTab)
-                    .tabItem {
-                        Label("Wishlist", systemImage: "heart")
-                    }
-                    .tag(1)
                 
                 MessageView(tab: self.$selectedTab)
                     .tabItem {
@@ -57,6 +70,7 @@ struct ContentView: View {
                     }
                     .tag(3)
             }//End of TabView
+//            .id(authenticationVM.isLoggedIn ? "loggedIn" : "loggedOut")
             .background(.white)
             .tint(Color(Constant.Color.primaryColor))
             .toolbar {
