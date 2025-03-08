@@ -10,6 +10,11 @@ import SwiftUI
 struct MessageView: View {
     @Environment(AuthenticationVM.self) var authenticationVM
     @Environment(UserVM.self) var userVM
+    @Environment(PropertyVM.self) var propertyVM
+    @Environment(LocationVM.self) var locationVM
+    @Environment(RequestVM.self) var requestVM
+    
+    @AppStorage("currentRole") private var currentRole: String = "Guest"
     
     @State private var toLoginScreen = false
     @State private var toSignupScreen = false
@@ -20,16 +25,41 @@ struct MessageView: View {
         NavigationStack {
             VStack {
                 if authenticationVM.isLoggedIn {
-                    
+                    if currentRole == "Guest" {
+                        if requestVM.listUserRequest.isEmpty {
+                            VStack {
+                                Text("Empty")
+                                    .font(.custom(Constant.Font.semiBold, size: 20))
+                                    .foregroundStyle(Color(Constant.Color.sencondaryText))
+                                Spacer()
+                            }
+                            .padding(30)
+                        } else {
+                            List {
+                                ForEach(requestVM.listUserRequest, id:\.self) { request in
+                                    NavigationLink {
+                                        RequestCancelView(request: request)
+                                    } label: {
+                                        RequestRow(request: request)
+                                    }
+                                        .listRowSeparator(.hidden)
+                                        .padding(.bottom, 30)
+                                }
+                            }
+                            .padding(.vertical, 30)
+                            .listStyle(.plain)
+                        }
+                    }
                 } else {
                     TemporaryViewForLogin(screenId: 2) {
                         toLoginScreen = true
                     } toSignup: {
                         toSignupScreen = true
                     }
+                    .padding(.horizontal)
                 }
             }//End of VStack
-            .padding(.horizontal)
+            
             .navigationDestination(isPresented: $toLoginScreen) {
                 LoginView(tab: self.$tab)
             }
@@ -47,4 +77,5 @@ struct MessageView: View {
         .environment(UserVM.shared)
         .environment(PropertyVM.shared)
         .environment(LocationVM.shared)
+        .environment(RequestVM.shared)
 }

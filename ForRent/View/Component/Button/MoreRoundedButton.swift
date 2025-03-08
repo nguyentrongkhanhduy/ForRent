@@ -19,7 +19,7 @@ struct MoreRoundedButton: View {
             HStack {
                 Image(systemName: systemImgString)
                 Text(text)
-                    .font(.custom(Constant.Font.semiBold, size: 18))
+                    .font(.custom(Constant.Font.semiBold, size: 14))
             }
             .padding()
             .padding(.horizontal)

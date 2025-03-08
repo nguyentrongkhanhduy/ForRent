@@ -77,4 +77,5 @@ struct ContentView: View {
         .environment(UserVM.shared)
         .environment(PropertyVM.shared)
         .environment(LocationVM.shared)
+        .environment(RequestVM.shared)
 }

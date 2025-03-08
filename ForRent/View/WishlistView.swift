@@ -40,17 +40,23 @@ struct WishlistView: View {
             VStack {
                 if authenticationVM.isLoggedIn {
                     ScrollView {
-                        LazyVGrid(columns: columns, spacing: 15) {
-                            ForEach(propertyVM.getWishlistProperties(wishList: userVM.user.wishList), id:\.self) { property in
-                                WishlistItem(property: property) {
-                                    performAddToWishList(property: property)
+                        if propertyVM.getWishlistProperties(wishList: userVM.user.wishList).isEmpty {
+                            Text("Empty")
+                                .font(.custom(Constant.Font.semiBold, size: 20))
+                                .foregroundStyle(Color(Constant.Color.sencondaryText))
+                        } else {
+                            LazyVGrid(columns: columns, spacing: 15) {
+                                ForEach(propertyVM.getWishlistProperties(wishList: userVM.user.wishList), id:\.self) { property in
+                                    WishlistItem(property: property) {
+                                        performAddToWishList(property: property)
+                                    }
+                                    .onTapGesture {
+                                        toDetailView = true
+                                        selectProperty = property
+                                    }
                                 }
-                                .onTapGesture {
-                                    toDetailView = true
-                                    selectProperty = property
-                                }
-                            }
 
+                            }
                         }
                     }
                     .padding(.vertical, 30)

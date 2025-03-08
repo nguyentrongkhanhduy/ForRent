@@ -198,8 +198,15 @@ struct ProfileView: View {
                                 text: "Switch to hosting",
                                 systemImgString: "arrow.trianglehead.swap"
                             ) {
+                                if currentRole == "Guest" {
+                                    currentRole = "Host"
+                                } else {
+                                    currentRole = "Guest"
+                                }
+                                
                                 
                             }
+                            .padding(.bottom)
                         }//top layer button
                     }
                     

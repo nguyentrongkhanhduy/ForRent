@@ -13,6 +13,7 @@ struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AuthenticationVM.self) var authenticationVM
     @Environment(UserVM.self) var userVM
+    @Environment(RequestVM.self) var requestVM
     
     @State private var password: String = ""
     @State private var showAlert: Bool = false
@@ -21,6 +22,7 @@ struct LoginView: View {
     @AppStorage("rememberMe") private var rememberCredential: Bool = false
     @AppStorage("savedEmail") private var savedEmail: String = ""
     @AppStorage("savedPassword") private var savedPassword: String = ""
+    @AppStorage("currentRole") private var currentRole: String = "Guest"
 
     private func loadSavedCredentials() {
         if rememberCredential {
@@ -143,4 +145,5 @@ struct LoginView: View {
         .environment(UserVM.shared)
         .environment(PropertyVM.shared)
         .environment(LocationVM.shared)
+        .environment(RequestVM.shared)
 }

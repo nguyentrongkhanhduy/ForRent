@@ -164,6 +164,8 @@ class UserVM {
             if let document = document, document.exists {
                 do {
                     self.user = try document.data(as: User.self)
+                    RequestVM.shared.fetchAllUserRequest(userId: userId)
+//                    RequestVM.shared.fetchAllOwnerRequest(ownerId: userId)
                     completion(true)
                     print("User data loaded successfully!")
                 } catch {

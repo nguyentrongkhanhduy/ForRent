@@ -14,6 +14,7 @@ struct ForRentApp: App {
     @State private var userVM = UserVM.shared
     @State private var propertyVM = PropertyVM.shared
     @State private var locationVM = LocationVM.shared
+    @State private var requestVM = RequestVM.shared
     
     init() {
         FirebaseApp.configure()
@@ -29,6 +30,7 @@ struct ForRentApp: App {
                 .environment(userVM)
                 .environment(propertyVM)
                 .environment(locationVM)
+                .environment(requestVM)
         }
     }
 }

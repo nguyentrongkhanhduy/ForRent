@@ -88,6 +88,26 @@ class PropertyVM {
             }
         }
     }
+    
+    func getPropertyById(propertyId: String, completion: @escaping (Property?) -> Void) {
+        db
+            .collection("properties")
+            .document(propertyId)
+            .getDocument { snapshot, error in
+                if error != nil {
+                    completion(nil)
+                    return
+                }
+                
+                guard let snapshot = snapshot, snapshot.exists,
+                      let propertyData = try? snapshot.data(as: Property.self) else {
+                    completion(nil)
+                    return
+                }
+                
+                completion(propertyData)
+            }
+    }
 }
 
 

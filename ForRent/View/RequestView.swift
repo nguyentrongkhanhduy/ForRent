@@ -9,15 +9,22 @@ import SwiftUI
 
 struct RequestView: View {
     @Environment(\.dismiss) var dismiss
-    
     @Environment(UserVM.self) var userVM
     @Environment(PropertyVM.self) var propertyVM
     @Environment(LocationVM.self) var locationVM
+    @Environment(RequestVM.self) var requestVM
     
     @State private var startDate = Date()
     @State private var endDate = Date()
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var toAvatarEdit = false
+    @State private var toPhoneEdit = false
+    @State private var toCardNumberEdit = false
     
     let property: Property
+    @Binding var tab: Int
     
     private func daysBetween(start: Date, end: Date) -> Int {
         let calendar = Calendar.current
@@ -28,6 +35,36 @@ struct RequestView: View {
         let components = calendar.dateComponents([.day], from: startDate, to: endDate)
         
         return max(components.day! + 1, 1)
+    }
+    
+    private func performAddRequest() {
+        if userVM.user.phone.isEmpty || userVM.user.avatarURL.isEmpty || userVM.user.cardNumber.isEmpty {
+            showAlert = true
+            alertTitle = "Error"
+            alertMessage = "Missing required information"
+            return
+        }
+        
+        var newRequest = Request()
+        newRequest.dateBegin = startDate
+        newRequest.dateEnd = endDate
+        newRequest.dateRequest = Date()
+        newRequest.ownerId = property.ownerId
+        newRequest.userId = userVM.user.id
+        newRequest.propertyId = property.id!
+        newRequest.status = "Pending"
+        
+        requestVM.createRequest(request: newRequest) { success in
+            if !success {
+                showAlert = true
+                alertTitle = "Error"
+                alertMessage = "Failed to request"
+            } else {
+                showAlert = true
+                alertTitle = "Success"
+                alertMessage = "Requested successfully"
+            }
+        }
     }
     
     var body: some View {
@@ -126,16 +163,16 @@ struct RequestView: View {
                             }
                             .font(.custom(Constant.Font.semiBold, size: 16))
                             .padding(.bottom, 4)
-                            HStack {
-                                Spacer()
-                                Button {
-                                    
-                                } label: {
-                                    Text("More info")
-                                        .font(.custom(Constant.Font.semiBold, size: 14))
-                                        .underline()
-                                }
-                            }
+//                            HStack {
+//                                Spacer()
+//                                Button {
+//                                    
+//                                } label: {
+//                                    Text("More info")
+//                                        .font(.custom(Constant.Font.semiBold, size: 14))
+//                                        .underline()
+//                                }
+//                            }
                         }
                     }
                     .foregroundStyle(Color(Constant.Color.primaryText))
@@ -168,7 +205,7 @@ struct RequestView: View {
                         BorderdClearedBackgroundButton(
                             text: userVM.user.cardNumber.isEmpty ? "Add card" : "Change"
                         ) {
-                            
+                            toCardNumberEdit = true
                         }
                     }
                     .padding()
@@ -198,7 +235,7 @@ struct RequestView: View {
                                     }
                                     Spacer()
                                     BorderdClearedBackgroundButton(text: "Add") {
-                                        
+                                        toPhoneEdit = true
                                     }
                                 }
                             }
@@ -216,7 +253,7 @@ struct RequestView: View {
                                     }
                                     Spacer()
                                     BorderdClearedBackgroundButton(text: "Add") {
-                                        
+                                        toAvatarEdit = true
                                     }
                                 }
                             }
@@ -268,7 +305,7 @@ struct RequestView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
                     PrimaryButton(text: "Request to book") {
-                        
+                        performAddRequest()
                     }
                     .padding()
                     
@@ -276,6 +313,7 @@ struct RequestView: View {
             }// end of scroll view
             .onAppear(perform: {
                 startDate = property.dateAvailable
+                endDate = startDate
             })
             .navigationBarBackButtonHidden()
             .toolbar {
@@ -293,6 +331,25 @@ struct RequestView: View {
                     }
                     .foregroundStyle(Color(Constant.Color.primaryText))
                 }
+            }
+            .alert(alertTitle, isPresented: $showAlert) {
+                Button("Ok", role: .cancel) {
+                    if alertTitle == "Success" {
+                        dismiss()
+                        tab = 2
+                    }
+                }
+            } message: {
+                Text(alertMessage)
+            }
+            .navigationDestination(isPresented: $toPhoneEdit) {
+                PersonalInformation()
+            }
+            .navigationDestination(isPresented: $toAvatarEdit) {
+                ChangeAvatarView()
+            }
+            .navigationDestination(isPresented: $toCardNumberEdit) {
+                PaymentInfo()
             }
         }// end of navstack
     }

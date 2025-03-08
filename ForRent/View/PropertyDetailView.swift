@@ -245,12 +245,7 @@ struct PropertyDetailView: View {
                         fetchPropertyInfo()
                     }
                 }
-                .navigationDestination(isPresented: $toRequest) {
-                    RequestView(property: property)
-                }
-                .navigationDestination(isPresented: $toLogin) {
-                    LoginView(tab: $tab)
-                }
+                
                 VStack {
                     Spacer()
                     VStack {
@@ -289,6 +284,12 @@ struct PropertyDetailView: View {
                 }
             }//end of ZStack
             .background(ignoresSafeAreaEdges: .bottom)
+            .navigationDestination(isPresented: $toRequest) {
+                RequestView(property: property, tab: $tab)
+            }
+            .navigationDestination(isPresented: $toLogin) {
+                LoginView(tab: $tab)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
