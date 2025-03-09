@@ -73,13 +73,13 @@ struct ContentView: View {
 //            .id(authenticationVM.isLoggedIn ? "loggedIn" : "loggedOut")
             .background(.white)
             .tint(Color(Constant.Color.primaryColor))
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text(self.toolBarTitle)
-                        .font(.custom(Constant.Font.semiBold, size: 30))
-                        .foregroundStyle(Color(Constant.Color.primaryText))
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Text(self.toolBarTitle)
+//                        .font(.custom(Constant.Font.semiBold, size: 30))
+//                        .foregroundStyle(Color(Constant.Color.primaryText))
+//                }
+//            }
         }//End of NavStack
         .accentColor(Color(Constant.Color.primaryText))
     }//End of body

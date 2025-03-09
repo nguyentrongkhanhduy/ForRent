@@ -25,6 +25,12 @@ struct MessageView: View {
         NavigationStack {
             VStack {
                 if authenticationVM.isLoggedIn {
+                    Text("Messages")
+                        .font(.custom(Constant.Font.semiBold, size: 30))
+                        .foregroundStyle(Color(Constant.Color.primaryText))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                    
                     if currentRole == "Guest" {
                         if requestVM.listUserRequest.isEmpty {
                             VStack {
@@ -46,10 +52,14 @@ struct MessageView: View {
                                         .padding(.bottom, 30)
                                 }
                             }
-                            .padding(.vertical, 30)
                             .listStyle(.plain)
                         }
                     }
+                    
+                    
+                    
+                    Spacer()
+                    
                 } else {
                     TemporaryViewForLogin(screenId: 2) {
                         toLoginScreen = true

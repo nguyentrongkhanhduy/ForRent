@@ -84,9 +84,14 @@ struct ListPropertyView: View {
                     .padding(.bottom, 25)
                 }
             }// end of zstack
-            .fullScreenCover(isPresented: $showMap, content: {
-                ExploreView(filterArea: filterCriteria.selectedArea, tab: $tab)
-            })
+            .fullScreenCover(
+                isPresented: $showMap,
+                content: {
+                    ExploreView(
+                        tab: $tab,
+                        filterCriteria: $filterCriteria
+                    )
+                })
             .sheet(isPresented: $showSearchTab) {
                 FilterView(filterCriteria: $filterCriteria) {
                     showSearchTab = false

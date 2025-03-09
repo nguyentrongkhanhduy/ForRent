@@ -40,6 +40,12 @@ struct WishlistView: View {
             VStack {
                 if authenticationVM.isLoggedIn {
                     ScrollView {
+                        Text("Wishlist")
+                            .font(.custom(Constant.Font.semiBold, size: 30))
+                            .foregroundStyle(Color(Constant.Color.primaryText))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                        
                         if propertyVM.getWishlistProperties(wishList: userVM.user.wishList).isEmpty {
                             Text("Empty")
                                 .font(.custom(Constant.Font.semiBold, size: 20))
@@ -55,11 +61,9 @@ struct WishlistView: View {
                                         selectProperty = property
                                     }
                                 }
-
                             }
                         }
                     }
-                    .padding(.vertical, 30)
                 } else {
                     TemporaryViewForLogin(screenId: 1) {
                         toLoginScreen = true

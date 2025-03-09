@@ -45,6 +45,12 @@ struct ProfileView: View {
                     if authenticationVM.isLoggedIn {
                         ZStack {
                             VStack {
+                                Text("Profile")
+                                    .font(.custom(Constant.Font.semiBold, size: 30))
+                                    .foregroundStyle(Color(Constant.Color.primaryText))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical)
+                                
                                 NavigationLink {
                                     ChangeAvatarView()
                                 } label: {

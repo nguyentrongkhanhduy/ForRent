@@ -293,9 +293,17 @@ struct PropertyDetailView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        Button {
-                            
-                        } label: {
+//                        Button {
+//                            
+//                        } label: {
+//                            Image(systemName: "square.and.arrow.up")
+//                                .resizable()
+//                                .scaledToFit()
+//                                .frame(width: 14)
+//                                .foregroundStyle(Color(Constant.Color.primaryText))
+//                        }
+                        
+                        ShareLink(item: "\(property.title), $\(String(format: "%.2f", property.price)) CAD") {
                             Image(systemName: "square.and.arrow.up")
                                 .resizable()
                                 .scaledToFit()

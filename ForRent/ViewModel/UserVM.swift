@@ -150,6 +150,7 @@ class UserVM {
     func fetchUserInfo(completion: @escaping (Bool) -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else {
             print("No authenticated user found.")
+            AuthenticationVM.shared.isLoggedIn = false
             completion(false)
             return
         }
@@ -166,6 +167,7 @@ class UserVM {
                     self.user = try document.data(as: User.self)
                     RequestVM.shared.fetchAllUserRequest(userId: userId)
 //                    RequestVM.shared.fetchAllOwnerRequest(ownerId: userId)
+                    AuthenticationVM.shared.isLoggedIn = true
                     completion(true)
                     print("User data loaded successfully!")
                 } catch {

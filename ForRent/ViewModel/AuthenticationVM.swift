@@ -17,9 +17,11 @@ class AuthenticationVM {
         return Auth.auth()
     }
     
-    var isLoggedIn: Bool {
-        return dbAuth.currentUser != nil
-    }
+//    var isLoggedIn: Bool {
+//        return dbAuth.currentUser != nil
+//    }
+    var isLoggedIn = false
+    
     var userID: String {
         if isLoggedIn {
             return dbAuth.currentUser!.uid
@@ -85,6 +87,7 @@ class AuthenticationVM {
                 completion(false)
             } else {
                 self.errorMessage = ""
+                self.isLoggedIn = true
                 completion(true)
             }
         }
@@ -131,6 +134,7 @@ class AuthenticationVM {
                         completion(false)
                     } else {
                         self.errorMessage = ""
+                        self.isLoggedIn = true
                         completion(true)
                     }
                 }
@@ -141,6 +145,7 @@ class AuthenticationVM {
             try dbAuth.signOut()
             self.email = ""
             self.errorMessage = ""
+            self.isLoggedIn = false
             UserVM.shared.user = User() //reset user
             completion()
         } catch {

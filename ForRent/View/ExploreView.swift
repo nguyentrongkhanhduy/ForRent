@@ -28,27 +28,36 @@ struct ExploreView: View {
     @State private var showLoginAlert = false
     @State private var toLogin = false
     @State private var showDetailView = false
-    
-    var filterArea: String
-    
+    @State private var showSearchTab = false
+
     @Binding var tab: Int
+    @Binding var filterCriteria: FilterCriteria
     
     private func performGetCurrentLocation() {
         locationVM.requestLocationPermisstion() {
             DispatchQueue.main.async {
                 if !locationVM.errorMessage.isEmpty {
                     showAlert = true
+                } else {
+                    if let location = locationVM.userLocation {
+                        defaultCameraPosition = .region(
+                            MKCoordinateRegion(
+                                center: location,
+                                span: MKCoordinateSpan(latitudeDelta: 0.33, longitudeDelta: 0.33)
+                            )
+                        )
+                    }
                 }
             }
         }
     }
     
     func updateCameraPosition() {
-        if self.filterArea.isEmpty {
+        if self.filterCriteria.selectedArea.isEmpty {
             return
         }
         var curLocation = CLLocationCoordinate2D()
-        switch filterArea {
+        switch self.filterCriteria.selectedArea {
         case "Toronto":
             curLocation = Constant.TorontoDistrict.Toronto
         case "Etobicoke":
@@ -88,7 +97,13 @@ struct ExploreView: View {
         NavigationStack {
             ZStack {
                 Map(position: $defaultCameraPosition) {
-                    ForEach(propertyVM.listProperty, id: \.self) { property in
+                    ForEach(propertyVM
+                        .getFilteredProperties(
+                            price: filterCriteria.desiredPrice,
+                            bath: filterCriteria.selectedBath,
+                            bed: filterCriteria.selectedBed,
+                            guest: filterCriteria.selectedGuest,
+                            date: filterCriteria.selectedDate), id: \.self) { property in
                         Annotation(
                             "Property",
                             coordinate: property.coordinate2D) {
@@ -101,15 +116,15 @@ struct ExploreView: View {
                     }
                     
                 }
-                .mapControls {
-    //                MapUserLocationButton()
-                }
+                //                .mapControls {
+                //                    MapUserLocationButton()
+                //                }
                 .onAppear {
-    //                performGetCurrentLocation() //get user permission
+                    //performGetCurrentLocation() //get user permission
                     updateCameraPosition()
                 }
                 .onChange(
-                    of: locationVM.userLocationEquatable
+                    of: filterCriteria.selectedArea
                 ) { _, _ in
                     updateCameraPosition()
                 }
@@ -118,11 +133,20 @@ struct ExploreView: View {
                 }, message: {
                     Text(locationVM.errorMessage)
                 })
-    //            .onTapGesture {
-    //                if showProperty {
-    //                    showProperty = false
-    //                }
-    //            }
+                //            .onTapGesture {
+                //                if showProperty {
+                //                    showProperty = false
+                //                }
+                //            }
+                
+                VStack{
+                    SearchBar()
+                        .padding()
+                        .onTapGesture {
+                            showSearchTab = true
+                        }
+                    Spacer()
+                }
                 
                 if showProperty, let property = selectedProperty {
                     VStack {
@@ -162,22 +186,49 @@ struct ExploreView: View {
                     Button {
                         dismiss()
                     } label: {
-                        HStack {
-                            Image(systemName: "chevron.backward")
-                            Text("Back")
-                        }
-                        .foregroundStyle(Color(Constant.Color.primaryText))
+                        Text("Close")
+                            .padding(8)
+                            .font(.custom(Constant.Font.semiBold, size: 16))
+                            .underline()
+                            .foregroundStyle(Color(Constant.Color.primaryText))
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        performGetCurrentLocation()
+                    } label: {
+                        Image(systemName: "location.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 18, height: 18)
+                            .padding(6)
+                            .foregroundStyle(Color(Constant.Color.primaryColor))
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(.black, lineWidth: 2)
+                                    .fill(.white)
+                                    .opacity(0.7)
+                                
+                            )
                     }
                 }
             }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .sheet(isPresented: $showSearchTab) {
+                FilterView(filterCriteria: $filterCriteria) {
+                    showSearchTab = false
+                }
+            }
         }//end of Navstack
-       
+        
     }
 }
 
 #Preview {
     @Previewable @State var test = 1
-    ExploreView(filterArea: "", tab: $test)
+    @Previewable @State var test2 = FilterCriteria()
+    ExploreView(tab: $test, filterCriteria: $test2)
         .environment(AuthenticationVM.shared)
         .environment(UserVM.shared)
         .environment(PropertyVM.shared)
