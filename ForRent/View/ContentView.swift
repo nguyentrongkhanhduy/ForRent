@@ -17,50 +17,54 @@ struct ContentView: View {
     @AppStorage("currentRole") private var currentRole = "Guest"
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            if !authenticationVM.isLoggedIn || currentRole == "Guest" {
-                NavigationStack {
+        NavigationStack {
+            TabView(selection: $selectedTab) {
+                if !authenticationVM.isLoggedIn || currentRole == "Guest" {
                     ListPropertyView(tab: $selectedTab)
-                }
-                .tabItem {
-                    Label("Explore", systemImage: "magnifyingglass")
-                }
-                .tag(0)
-                
-                NavigationStack {
+                        .tabItem {
+                            Label("Explore", systemImage: "magnifyingglass")
+                        }
+                        .tag(0)
+                    
+                    
                     WishlistView(tab: $selectedTab)
-                }
-                .tabItem {
-                    Label("Wishlist", systemImage: "heart")
-                }
-                .tag(1)
-            } else {
-                NavigationStack {
+                        .tabItem {
+                            Label("Wishlist", systemImage: "heart")
+                        }
+                        .tag(1)
+                } else {
                     ListingView(tab: $selectedTab)
+                        .tabItem {
+                            Label("Listing", systemImage: "house")
+                        }
+                        .tag(4)
                 }
-                .tabItem {
-                    Label("Listing", systemImage: "house")
-                }
-                .tag(4)
-            }
-            
-            NavigationStack {
+                
                 MessageView(tab: $selectedTab)
-            }
-            .tabItem {
-                Label("Messages", systemImage: "message")
-            }
-            .tag(2)
-            
-            NavigationStack {
+                    .tabItem {
+                        Label("Messages", systemImage: "message")
+                    }
+                    .tag(2)
+                
                 ProfileView(tab: $selectedTab)
+                    .tabItem {
+                        Label("Profile", systemImage: "person.crop.circle")
+                    }
+                    .tag(3)
             }
-            .tabItem {
-                Label("Profile", systemImage: "person.crop.circle")
+            .tint(Color(Constant.Color.primaryColor))
+            .toolbar {
+                if selectedTab == 4 {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            //                                    isAddingNew = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
             }
-            .tag(3)
         }
-        .tint(Color(Constant.Color.primaryColor))
         .accentColor(Color(Constant.Color.primaryText))
     }
 }

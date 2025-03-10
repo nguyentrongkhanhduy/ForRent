@@ -46,6 +46,7 @@ struct ProfileView: View {
                         .font(.custom(Constant.Font.semiBold, size: 30))
                         .foregroundStyle(Color(Constant.Color.primaryText))
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical)
                     
                     if authenticationVM.isLoggedIn {
                         ZStack {

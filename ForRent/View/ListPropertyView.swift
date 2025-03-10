@@ -46,6 +46,7 @@ struct ListPropertyView: View {
                         .onTapGesture {
                             showSearchTab = true
                         }
+                        .padding(.top)
                     
                     List {
                         ForEach(

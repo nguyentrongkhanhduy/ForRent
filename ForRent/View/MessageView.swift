@@ -27,7 +27,7 @@ struct MessageView: View {
                     .font(.custom(Constant.Font.semiBold, size: 30))
                     .foregroundStyle(Color(Constant.Color.primaryText))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
+                    .padding()
                 
                 if authenticationVM.isLoggedIn {
                     if currentRole == "Guest" {

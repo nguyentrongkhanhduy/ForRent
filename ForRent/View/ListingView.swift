@@ -53,15 +53,15 @@ struct ListingView: View {
             
             
             
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        isAddingNew = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//                    Button {
+//                        isAddingNew = true
+//                    } label: {
+//                        Image(systemName: "plus")
+//                    }
+//                }
+//            }
             .navigationDestination(isPresented: $isAddingNew) {
                 // Create a new property with default values.
                 PropertyEditView(
