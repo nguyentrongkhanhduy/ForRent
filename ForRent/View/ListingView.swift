@@ -21,27 +21,38 @@ struct ListingView: View {
     
     var body: some View {
         NavigationStack {
-            List {
-                // Filter properties so that only those owned by the current user (host) are shown.
-                ForEach(
-                    propertyVM.listProperty.filter { $0.ownerId == authenticationVM.userID },
-                    id: \.self
-                ) { property in
-                    ListItem(property: property) {
-                        // Optional: add host-specific actions here.
-                    }
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.clear)
-                    .padding(.bottom, 10)
-                    .onTapGesture {
-                        selectedProperty = property
-                        showDetailView = true
+            VStack {
+                Text("Your listing")
+                    .font(.custom(Constant.Font.semiBold, size: 30))
+                    .foregroundStyle(Color(Constant.Color.primaryText))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                
+                List {
+                    // Filter properties so that only those owned by the current user (host) are shown.
+                    ForEach(
+                        propertyVM.listProperty.filter { $0.ownerId == authenticationVM.userID },
+                        id: \.self
+                    ) { property in
+                        ListItem(property: property) {
+                            // Optional: add host-specific actions here.
+                        }
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        .padding(.bottom, 10)
+                        .onTapGesture {
+                            selectedProperty = property
+                            showDetailView = true
+                        }
                     }
                 }
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
             }
-            .scrollContentBackground(.hidden)
-            .background(Color.clear)
-            .navigationTitle("My Listings")
+            
+            
+            
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

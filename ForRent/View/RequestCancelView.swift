@@ -169,7 +169,6 @@ struct RequestCancelView: View {
                 }
                 .padding(.bottom, 30)
             }
-            .navigationTitle("Request Details")
             .alert(alertTitle, isPresented: $showAlert) {
                 Button("Ok", role: .cancel) {
                     if alertTitle == "Success" {
