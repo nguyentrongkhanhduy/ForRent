@@ -6,12 +6,82 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct ListingView: View {
+    @Environment(AuthenticationVM.self) var authenticationVM
+    @Environment(PropertyVM.self) var propertyVM
     @Binding var tab: Int
     
+    @State private var showDetailView = false
+    @State private var selectedProperty: Property?
+    @State private var isAddingNew = false
+    @State private var showLoginAlert = false
+    @State private var toLogin = false
+    
     var body: some View {
-        Text("My listing")
+        NavigationStack {
+            List {
+                // Filter properties so that only those owned by the current user (host) are shown.
+                ForEach(
+                    propertyVM.listProperty.filter { $0.ownerId == authenticationVM.userID },
+                    id: \.self
+                ) { property in
+                    ListItem(property: property) {
+                        // Optional: add host-specific actions here.
+                    }
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .padding(.bottom, 10)
+                    .onTapGesture {
+                        selectedProperty = property
+                        showDetailView = true
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(Color.clear)
+            .navigationTitle("My Listings")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        isAddingNew = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .navigationDestination(isPresented: $isAddingNew) {
+                // Create a new property with default values.
+                PropertyEditView(
+                    property: Property(
+                        ownerId: authenticationVM.userID,
+                        title: "",
+                        bedroom: 0,
+                        bathroom: 0,
+                        guest: 1,
+                        description: "",
+                        imgURL: "",
+                        isAvailable: true,
+                        isDelisted: false,
+                        price: 0.0,
+                        coordinate: FirebaseFirestore.GeoPoint(latitude: 0.0, longitude: 0.0),
+                        dateAdded: Date(),
+                        dateUpdated: Date(),
+                        dateAvailable: Date()
+                    ),
+                    isEditing: false
+                )
+            }
+            .navigationDestination(isPresented: $showDetailView) {
+                if let property = selectedProperty {
+                    PropertyDetailView(property: property, tab: $tab)
+                }
+            }
+            .navigationDestination(isPresented: $toLogin) {
+                LoginView(tab: $tab)
+            }
+        }
     }
 }
 

@@ -6,97 +6,65 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
+import MapKit
 
 struct RequestCancelView: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(UserVM.self) var userVM
     @Environment(PropertyVM.self) var propertyVM
-    @Environment(LocationVM.self) var locationVM
     @Environment(RequestVM.self) var requestVM
+    @AppStorage("currentRole") private var currentRole: String = "Guest"
+    @Binding var tab: Int
     
+    // This view is initialized with an existing Request.
+    let request: Request
+    
+    // Fetched property details.
     @State private var property: Property?
+    
+    // For local date display.
+    @State private var startDate: Date = Date()
+    @State private var endDate: Date = Date()
+    
+    // Request status.
+    @State private var curStatus: String = ""
+    
+    // Alert state.
     @State private var showAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State private var curStatus = ""
-    
-    let request: Request
-    
-    private func fetchRequestData() {
-        propertyVM.getPropertyById(propertyId: request.propertyId) { property in
-            self.property = property
-        }
-        
-        startDate = request.dateBegin
-        endDate = request.dateEnd
-        curStatus = request.status
-    }
-    
-    private func daysBetween(start: Date, end: Date) -> Int {
-        let calendar = Calendar.current
-        
-        let startDate = calendar.startOfDay(for: start)
-        let endDate = calendar.startOfDay(for: end)
-        
-        let components = calendar.dateComponents([.day], from: startDate, to: endDate)
-        
-        return max(components.day! + 1, 1)
-    }
-    
-    private func performCancelRequest() {
-        requestVM.cancelRequest(requestId: request.id!) { success in
-            if success {
-                showAlert = true
-                alertTitle = "Request Cancelled"
-                alertMessage = ""
-                curStatus = "Cancelled"
-            } else {
-                
-            }
-        }
-    }
     
     var body: some View {
         NavigationStack {
             ScrollView {
-                if let property = self.property {
-                    VStack {
-                        
+                VStack {
+                    if let property = property {
+                        // Property summary section.
                         SummaryRow(property: property)
                         
                         Divider()
                             .frame(height: 5)
                             .background(Color(.systemGray5))
                         
+                        // Request details section.
                         VStack(alignment: .leading) {
-                            Text("Your trip")
+                            Text("Request Details")
                                 .font(.custom(Constant.Font.semiBold, size: 18))
                                 .padding(.bottom, 8)
                             
-                            VStack(alignment: .leading) {
-                                Text("Guests")
-                                    .font(.custom(Constant.Font.semiBold, size: 15))
-                                Text("\(property.guest) \(property.guest > 1 ? "guests" : "guest")")
-                                    .font(.custom(Constant.Font.regular, size: 14))
-                            }
-                            .padding(.bottom, 8)
-                            
                             HStack(alignment: .firstTextBaseline) {
                                 VStack(alignment: .leading) {
-                                    Text("Start date")
+                                    Text("Start Date")
                                         .font(.custom(Constant.Font.semiBold, size: 15))
                                     Text(startDate.getFullFormatDate())
                                         .font(.custom(Constant.Font.regular, size: 14))
                                 }
                                 Spacer()
                                 VStack(alignment: .trailing) {
-                                    Text("End date")
+                                    Text("End Date")
                                         .font(.custom(Constant.Font.semiBold, size: 15))
                                     Text(endDate.getFullFormatDate())
                                         .font(.custom(Constant.Font.regular, size: 14))
-                                        .datePickerStyle(.compact)
                                 }
                             }
                         }
@@ -108,8 +76,9 @@ struct RequestCancelView: View {
                             .frame(height: 5)
                             .background(Color(.systemGray5))
                         
+                        // Price details section.
                         VStack(alignment: .leading) {
-                            Text("Price details")
+                            Text("Price Details")
                                 .font(.custom(Constant.Font.semiBold, size: 18))
                                 .padding(.bottom, 8)
                             
@@ -151,16 +120,6 @@ struct RequestCancelView: View {
                                 }
                                 .font(.custom(Constant.Font.semiBold, size: 16))
                                 .padding(.bottom, 4)
-                                //                            HStack {
-                                //                                Spacer()
-                                //                                Button {
-                                //
-                                //                                } label: {
-                                //                                    Text("More info")
-                                //                                        .font(.custom(Constant.Font.semiBold, size: 14))
-                                //                                        .underline()
-                                //                                }
-                                //                            }
                             }
                         }
                         .foregroundStyle(Color(Constant.Color.primaryText))
@@ -171,43 +130,139 @@ struct RequestCancelView: View {
                             .frame(height: 5)
                             .background(Color(.systemGray5))
                         
-                        if curStatus == "Pending" {
-                            SecondaryButton(text: "Cancel Request") {
-                                showAlert = true
-                                alertTitle = "Cancel Request"
-                                alertMessage = "Are you sure you want to cancel this request?"
+                        // Action Buttons – host mode vs guest mode.
+                        if currentRole != "Guest" {
+                            if curStatus == "Pending" {
+                                SecondaryButton(text: "Approve Request") {
+                                    showAlert = true
+                                    alertTitle = "Approve Request"
+                                    alertMessage = "Are you sure you want to approve this request?"
+                                    approveRequest()
+                                }
+                                .padding()
+                                SecondaryButton(text: "Deny Request") {
+                                    showAlert = true
+                                    alertTitle = "Deny Request"
+                                    alertMessage = "Are you sure you want to deny this request?"
+                                    denyRequest()
+                                }
+                                .padding()
                             }
-                            .padding()
-                        } else if curStatus == "Cancelled" {
-                            SecondaryButton(text: "Request Cancelled") {
-                                
+                        } else {
+                            if curStatus == "Pending" {
+                                SecondaryButton(text: "Cancel Request") {
+                                    showAlert = true
+                                    alertTitle = "Cancel Request"
+                                    alertMessage = "Are you sure you want to cancel this request?"
+                                }
+                                .padding()
+                            } else if curStatus == "Cancelled" {
+                                SecondaryButton(text: "Request Cancelled") {
+                                    
+                                }
+                                .padding()
                             }
-                            .padding()
                         }
                         
                         Spacer()
                     }
                 }
-                
-            }//end of scroll view
-            .onAppear {
-                fetchRequestData()
+                .padding(.bottom, 30)
             }
+            .navigationTitle("Request Details")
             .alert(alertTitle, isPresented: $showAlert) {
-                if alertTitle == "Cancel Request" {
-                    Button("Cancel", role: .cancel) {}
-                    Button("OK", role: .destructive) {
-                        performCancelRequest()
+                Button("Ok", role: .cancel) {
+                    if alertTitle == "Success" {
+                        dismiss()
+                        tab = 2
                     }
-                } else {
-                    Button("OK", role: .cancel) {}
                 }
             } message: {
                 Text(alertMessage)
             }
-
+            .onAppear {
+                propertyVM.getPropertyById(propertyId: request.propertyId) { fetchedProperty in
+                    if let fetchedProperty = fetchedProperty {
+                        self.property = fetchedProperty
+                    }
+                }
+                startDate = request.dateBegin
+                endDate = request.dateEnd
+                curStatus = request.status
+            }
         }
-        
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func daysBetween(start: Date, end: Date) -> Int {
+        let calendar = Calendar.current
+        let startDay = calendar.startOfDay(for: start)
+        let endDay = calendar.startOfDay(for: end)
+        let components = calendar.dateComponents([.day], from: startDay, to: endDay)
+        return max((components.day ?? 0) + 1, 1)
+    }
+    
+    // MARK: - Host Action Functions
+    
+    func approveRequest() {
+        guard let reqId = request.id, !reqId.isEmpty else { return }
+        requestVM.approveRequest(requestId: reqId) { success in
+            if success {
+                // If the property is available, update its available date.
+                if var currentProperty = property {
+                    currentProperty.dateAvailable = request.dateEnd
+                    propertyVM.updateProperty(property: currentProperty) { updateSuccess in
+                        if updateSuccess {
+                            alertTitle = "Success"
+                            alertMessage = "Request approved and property availability updated."
+                        } else {
+                            alertTitle = "Success"
+                            alertMessage = "Request approved, but failed to update property availability."
+                        }
+                        showAlert = true
+                    }
+                } else {
+                    alertTitle = "Success"
+                    alertMessage = "Request approved successfully."
+                    showAlert = true
+                }
+            } else {
+                alertTitle = "Error"
+                alertMessage = "Failed to approve request."
+                showAlert = true
+            }
+        }
+    }
+    
+    func denyRequest() {
+        guard let reqId = request.id, !reqId.isEmpty else { return }
+        requestVM.denyRequest(requestId: reqId) { success in
+            if success {
+                alertTitle = "Success"
+                alertMessage = "Request denied successfully."
+                showAlert = true
+            } else {
+                alertTitle = "Error"
+                alertMessage = "Failed to deny request."
+                showAlert = true
+            }
+        }
+    }
+    
+    func cancelRequest() {
+        guard let reqId = request.id, !reqId.isEmpty else { return }
+        requestVM.cancelRequest(requestId: reqId) { success in
+            if success {
+                alertTitle = "Success"
+                alertMessage = "Request cancelled successfully."
+                showAlert = true
+            } else {
+                alertTitle = "Error"
+                alertMessage = "Failed to cancel request."
+                showAlert = true
+            }
+        }
     }
 }
 

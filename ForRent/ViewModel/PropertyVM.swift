@@ -110,4 +110,43 @@ class PropertyVM {
     }
 }
 
-
+extension PropertyVM {
+    func addProperty(property: Property, completion: @escaping (Bool) -> Void) {
+        do {
+            _ = try db.collection("properties").addDocument(from: property) { error in
+                if let error = error {
+                    print("Error adding property: \(error.localizedDescription)")
+                    completion(false)
+                } else {
+                    print("Property added successfully.")
+                    completion(true)
+                }
+            }
+        } catch {
+            print("Error encoding property: \(error.localizedDescription)")
+            completion(false)
+        }
+    }
+    
+    func updateProperty(property: Property, completion: @escaping (Bool) -> Void) {
+        guard let propertyId = property.id, !propertyId.isEmpty else {
+            print("Property id is nil or empty")
+            completion(false)
+            return
+        }
+        do {
+            try db.collection("properties").document(propertyId).setData(from: property, merge: true) { error in
+                if let error = error {
+                    print("Error updating property: \(error.localizedDescription)")
+                    completion(false)
+                } else {
+                    print("Property updated successfully.")
+                    completion(true)
+                }
+            }
+        } catch {
+            print("Error encoding property: \(error.localizedDescription)")
+            completion(false)
+        }
+    }
+}

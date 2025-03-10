@@ -13,28 +13,22 @@ struct MessageView: View {
     @Environment(PropertyVM.self) var propertyVM
     @Environment(LocationVM.self) var locationVM
     @Environment(RequestVM.self) var requestVM
-    
+
     @AppStorage("currentRole") private var currentRole: String = "Guest"
-    
     @State private var toLoginScreen = false
     @State private var toSignupScreen = false
-    
+
     @Binding var tab: Int
-    
+
     var body: some View {
         NavigationStack {
             VStack {
                 if authenticationVM.isLoggedIn {
-                    Text("Messages")
-                        .font(.custom(Constant.Font.semiBold, size: 30))
-                        .foregroundStyle(Color(Constant.Color.primaryText))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                    
                     if currentRole == "Guest" {
+                        // Tenant's messages (user requests)
                         if requestVM.listUserRequest.isEmpty {
                             VStack {
-                                Text("Empty")
+                                Text("No messages yet.")
                                     .font(.custom(Constant.Font.semiBold, size: 20))
                                     .foregroundStyle(Color(Constant.Color.sencondaryText))
                                 Spacer()
@@ -42,24 +36,46 @@ struct MessageView: View {
                             .padding(30)
                         } else {
                             List {
-                                ForEach(requestVM.listUserRequest, id:\.self) { request in
+                                ForEach(requestVM.listUserRequest, id: \.self) { request in
                                     NavigationLink {
-                                        RequestCancelView(request: request)
+                                        RequestCancelView(tab: $tab, request: request)
                                     } label: {
                                         RequestRow(request: request)
                                     }
-                                        .listRowSeparator(.hidden)
-                                        .padding(.bottom, 30)
+                                    .listRowSeparator(.hidden)
+                                    .padding(.bottom, 30)
                                 }
                             }
+                            .padding(.vertical, 30)
+                            .listStyle(.plain)
+                        }
+                    } else {
+                        // Host's messages (owner requests)
+                        if requestVM.listOwnerRequest.isEmpty {
+                            VStack {
+                                Text("No incoming requests.")
+                                    .font(.custom(Constant.Font.semiBold, size: 20))
+                                    .foregroundStyle(Color(Constant.Color.sencondaryText))
+                                Spacer()
+                            }
+                            .padding(30)
+                        } else {
+                            List {
+                                ForEach(requestVM.listOwnerRequest, id: \.self) { request in
+                                    NavigationLink {
+                                        // Navigate to the host's RequestView.
+                                        RequestCancelView(tab: $tab, request: request)
+                                    } label: {
+                                        RequestRow(request: request)
+                                    }
+                                    .listRowSeparator(.hidden)
+                                    .padding(.bottom, 30)
+                                }
+                            }
+                            .padding(.vertical, 30)
                             .listStyle(.plain)
                         }
                     }
-                    
-                    
-                    
-                    Spacer()
-                    
                 } else {
                     TemporaryViewForLogin(screenId: 2) {
                         toLoginScreen = true
@@ -68,24 +84,30 @@ struct MessageView: View {
                     }
                     .padding(.horizontal)
                 }
-            }//End of VStack
-            
+            }
             .navigationDestination(isPresented: $toLoginScreen) {
-                LoginView(tab: self.$tab)
+                LoginView(tab: $tab)
             }
             .navigationDestination(isPresented: $toSignupScreen) {
-                SignupView(tab: self.$tab)
+                SignupView(tab: $tab)
             }
-        }//End of NavStack
-    }//End of body
+            .onAppear {
+                if currentRole == "Guest" {
+                    requestVM.fetchAllUserRequest(userId: authenticationVM.userID)
+                } else {
+                    requestVM.fetchAllOwnerRequest(ownerId: authenticationVM.userID)
+                }
+            }
+        }
+    }
 }
 
-#Preview {
-    @Previewable @State var test = 1
-    MessageView(tab: $test)
-        .environment(AuthenticationVM.shared)
-        .environment(UserVM.shared)
-        .environment(PropertyVM.shared)
-        .environment(LocationVM.shared)
-        .environment(RequestVM.shared)
-}
+//#Preview {
+//    @Previewable @State var test = 1
+//    MessageView(tab: $test)
+//        .environment(AuthenticationVM.shared)
+//        .environment(UserVM.shared)
+//        .environment(PropertyVM.shared)
+//        .environment(LocationVM.shared)
+//        .environment(RequestVM.shared)
+//}

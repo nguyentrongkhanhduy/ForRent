@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ListItem: View {
     @Environment(LocationVM.self) var locationVM
+    @AppStorage("currentRole") private var currentRole: String = "Guest"
     
     @State private var cityStateCountry = "Toronto"
     
@@ -41,16 +42,17 @@ struct ListItem: View {
                     .padding(.top, 1)
                 }
                 .frame(width: 350, alignment: .leading)
-                
-                
             }
             .frame(width: 350)
            
             HStack {
                 Spacer()
                 
-                FavouriteButton(property: property) {
-                    addtoWishlist()
+                // Only show FavouriteButton if the current role is "Guest"
+                if currentRole == "Guest" {
+                    FavouriteButton(property: property) {
+                        addtoWishlist()
+                    }
                 }
             }
             .padding(.trailing, 14)
@@ -59,15 +61,11 @@ struct ListItem: View {
             .zIndex(2)
         }
         .onAppear {
-            locationVM
-                .fetchCityStateCountry(
-                    from: property.coordinate2D) { result in
-                        cityStateCountry = result
-                    }
+            locationVM.fetchCityStateCountry(from: property.coordinate2D) { result in
+                cityStateCountry = result
+            }
         }
     }
-    
-    
 }
 
 //#Preview {

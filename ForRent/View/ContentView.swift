@@ -14,75 +14,65 @@ struct ContentView: View {
     @Environment(LocationVM.self) var locationVM
     
     @State private var selectedTab = 0
-    
     @AppStorage("currentRole") private var currentRole = "Guest"
     
     private var toolBarTitle: String {
         switch selectedTab {
-        case 0:
-            ""
-        case 1:
-            "Wishlist"
-        case 2:
-            "Messages"
-        case 3:
-            "Profile"
-        case 4:
-            "Your listing"
-        default:
-            ""
+        case 0: return ""
+        case 1: return "Wishlist"
+        case 2: return "Messages"
+        case 3: return "Profile"
+        case 4: return "Your Listing"
+        default: return ""
         }
     }
     
     var body: some View {
-        NavigationStack {
-            TabView(selection: $selectedTab) {
-                if authenticationVM.isLoggedIn == false || currentRole == "Guest"  {
-                    ListPropertyView(tab: self.$selectedTab)
-                        .tabItem {
-                            Label("Explore", systemImage: "magnifyingglass")
-                        }
-                        .tag(0)
-                    
-                    WishlistView(tab: self.$selectedTab)
-                        .tabItem {
-                            Label("Wishlist", systemImage: "heart")
-                        }
-                        .tag(1)
-                } else {
-                    ListingView(tab: self.$selectedTab)
-                        .tabItem {
-                            Label("Listing", systemImage: "house")
-                        }
-                        .tag(4)
+        TabView(selection: $selectedTab) {
+            if !authenticationVM.isLoggedIn || currentRole == "Guest" {
+                NavigationStack {
+                    ListPropertyView(tab: $selectedTab)
                 }
+                .tabItem {
+                    Label("Explore", systemImage: "magnifyingglass")
+                }
+                .tag(0)
                 
-                
-                MessageView(tab: self.$selectedTab)
-                    .tabItem {
-                        Label("Messages", systemImage: "message")
-                    }
-                    .tag(2)
-                
-                ProfileView(tab: self.$selectedTab)
-                    .tabItem {
-                        Label("Profile", systemImage: "person.crop.circle")
-                    }
-                    .tag(3)
-            }//End of TabView
-//            .id(authenticationVM.isLoggedIn ? "loggedIn" : "loggedOut")
-            .background(.white)
-            .tint(Color(Constant.Color.primaryColor))
-//            .toolbar {
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Text(self.toolBarTitle)
-//                        .font(.custom(Constant.Font.semiBold, size: 30))
-//                        .foregroundStyle(Color(Constant.Color.primaryText))
-//                }
-//            }
-        }//End of NavStack
+                NavigationStack {
+                    WishlistView(tab: $selectedTab)
+                }
+                .tabItem {
+                    Label("Wishlist", systemImage: "heart")
+                }
+                .tag(1)
+            } else {
+                NavigationStack {
+                    ListingView(tab: $selectedTab)
+                }
+                .tabItem {
+                    Label("Listing", systemImage: "house")
+                }
+                .tag(4)
+            }
+            
+            NavigationStack {
+                MessageView(tab: $selectedTab)
+            }
+            .tabItem {
+                Label("Messages", systemImage: "message")
+            }
+            .tag(2)
+            
+            NavigationStack {
+                ProfileView(tab: $selectedTab)
+            }
+            .tabItem {
+                Label("Profile", systemImage: "person.crop.circle")
+            }
+            .tag(3)
+        }
         .accentColor(Color(Constant.Color.primaryText))
-    }//End of body
+    }
 }
 
 #Preview {

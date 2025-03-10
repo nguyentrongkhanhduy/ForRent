@@ -14,11 +14,14 @@ struct PropertyDetailView: View {
     @Environment(PropertyVM.self) var propertyVM
     @Environment(LocationVM.self) var locationVM
     
+    // Add currentRole from AppStorage
+    @AppStorage("currentRole") private var currentRole: String = "Guest"
+    
     @State private var owner: User?
     @State private var cityStateCountry = "Toronto"
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 43.642954, longitude: -79.394835), // Toronto
+            center: CLLocationCoordinate2D(latitude: 43.642954, longitude: -79.394835),
             span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         )
     )
@@ -27,7 +30,9 @@ struct PropertyDetailView: View {
     @State private var showLoginAlert = false
     @State private var toLogin = false
     @State private var toRequest = false
-    
+    // New state to trigger edit navigation
+    @State private var toEdit = false
+
     var property: Property
     @Binding var tab: Int
     
@@ -39,23 +44,20 @@ struct PropertyDetailView: View {
         }
     }
     
-    private func performAddToWishList(property: Property) {
+    private func performAddToWishList() {
         if authenticationVM.isLoggedIn {
-            guard let propId = property.id else {
+            guard let propId = property.id, !propId.isEmpty else {
                 print("Error adding to wishlist")
                 return
             }
-            userVM
-                .addOrRemoveToWishList(
-                    userId: authenticationVM.userID,
-                    propertyId: propId)
+            userVM.addOrRemoveToWishList(userId: authenticationVM.userID, propertyId: propId)
         } else {
             showLoginAlert = true
         }
     }
     
     private func updateWishlistState() {
-        guard authenticationVM.isLoggedIn, let propertyId = property.id else {
+        guard authenticationVM.isLoggedIn, let propertyId = property.id, !propertyId.isEmpty else {
             isInWishlist = false
             return
         }
@@ -63,26 +65,23 @@ struct PropertyDetailView: View {
     }
     
     private func fetchPropertyInfo() {
-        
         userVM.fetchOwnerInfo(ownerId: property.ownerId) { ownerData in
             self.owner = ownerData
         }
         
-        locationVM
-            .fetchCityStateCountry(
-                from: property.coordinate2D) { result in
-                    cityStateCountry = result
-                }
+        locationVM.fetchCityStateCountry(from: property.coordinate2D) { result in
+            cityStateCountry = result
+        }
         
-        amenities += "\(property.bedroom) \(property.bedroom > 1 ? "beds" : "bed"), "
-        amenities += "\(property.bathroom) \(property.bathroom > 1 ? "baths" : "bath") for "
-        amenities += "\(property.guest) \(property.guest > 1 ? "guests." : "guest.")"
+        amenities = "\(property.bedroom) \(property.bedroom > 1 ? "beds" : "bed"), " +
+                    "\(property.bathroom) \(property.bathroom > 1 ? "baths" : "bath") for " +
+                    "\(property.guest) \(property.guest > 1 ? "guests" : "guest")"
     }
     
     private func reCenterMap(position: CLLocationCoordinate2D) {
         cameraPosition = .region(
             MKCoordinateRegion(
-                center: position, // Toronto
+                center: position,
                 span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             )
         )
@@ -93,11 +92,7 @@ struct PropertyDetailView: View {
             ZStack {
                 ScrollView {
                     VStack {
-                        AsyncImage(
-                            url: URL(
-                                string: property.imgURL
-                            )
-                        ) { image in
+                        AsyncImage(url: URL(string: property.imgURL)) { image in
                             image
                                 .resizable()
                                 .scaledToFit()
@@ -111,25 +106,21 @@ struct PropertyDetailView: View {
                             Text(property.title)
                                 .font(.custom(Constant.Font.semiBold, size: 25))
                                 .foregroundStyle(Color(Constant.Color.primaryText))
-                            
-                            
                                 .padding(.top, 20)
                             
                             Text("Room in \(cityStateCountry)")
                                 .font(.custom(Constant.Font.semiBold, size: 16))
                                 .foregroundStyle(Color(Constant.Color.primaryText))
                                 .padding(.top, 1)
+                            
                             Text(amenities)
                                 .font(.custom(Constant.Font.regular, size: 14))
-                                .foregroundStyle(
-                                    Color(Constant.Color.sencondaryText)
-                                )
+                                .foregroundStyle(Color(Constant.Color.sencondaryText))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         
-                        Divider()
-                            .padding(.horizontal)
+                        Divider().padding(.horizontal)
                         
                         HStack {
                             if let owner = self.owner {
@@ -139,32 +130,23 @@ struct PropertyDetailView: View {
                                     Text("Hosted by \(owner.username)")
                                         .font(.custom(Constant.Font.semiBold, size: 14))
                                         .foregroundStyle(Color(Constant.Color.primaryText))
-                                    Spacer()
                                     HStack {
                                         Text("Verified host")
-                                            .font(
-                                                .custom(Constant.Font.regular, size: 14)
-                                            )
-                                            .foregroundStyle(
-                                                Color(Constant.Color.sencondaryText)
-                                            )
+                                            .font(.custom(Constant.Font.regular, size: 14))
+                                            .foregroundStyle(Color(Constant.Color.sencondaryText))
                                         Image(systemName: "checkmark.circle.fill")
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 14)
-                                            .foregroundStyle(
-                                                Color(Constant.Color.subText)
-                                            )
+                                            .foregroundStyle(Color(Constant.Color.subText))
                                     }
                                 }
                             }
-                            
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         
-                        Divider()
-                            .padding(.horizontal)
+                        Divider().padding(.horizontal)
                         
                         VStack(alignment: .leading) {
                             Text("About this place")
@@ -178,10 +160,7 @@ struct PropertyDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         
-                        Divider()
-                            .padding(.horizontal)
-                        
-                        Spacer()
+                        Divider().padding(.horizontal)
                         
                         VStack(alignment: .leading) {
                             Text("Where you'll be")
@@ -200,10 +179,7 @@ struct PropertyDetailView: View {
                                         .foregroundStyle(Color(Constant.Color.primaryText))
                                         .underline()
                                 }
-                                
-                                
                             }
-                            
                             Map(position: $cameraPosition) {
                                 Annotation("", coordinate: property.coordinate2D) {
                                     Image(systemName: "house.circle.fill")
@@ -214,36 +190,28 @@ struct PropertyDetailView: View {
                                 MapCircle(center: property.coordinate2D, radius: 200)
                                     .foregroundStyle(.black.opacity(0.2))
                             }
-                            .onAppear(perform: {
-                                reCenterMap(position: property.coordinate2D)
-                            })
+                            .onAppear { reCenterMap(position: property.coordinate2D) }
                             .frame(height: 400)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         
-                        Divider()
-                            .padding(.horizontal)
+                        Divider().padding(.horizontal)
                         
-                        VStack(alignment: .leading)  {
+                        VStack(alignment: .leading) {
                             Text("Availability")
                                 .font(.custom(Constant.Font.semiBold, size: 20))
                                 .foregroundStyle(Color(Constant.Color.primaryText))
                             Text(property.dateAvailable.getFullFormatDate())
                                 .font(.custom(Constant.Font.regular, size: 14))
-                                .foregroundStyle(
-                                    Color(Constant.Color.sencondaryText)
-                                )
+                                .foregroundStyle(Color(Constant.Color.sencondaryText))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .padding(.bottom, 100)
-                        
                     }
-                    .onAppear {
-                        fetchPropertyInfo()
-                    }
+                    .onAppear { fetchPropertyInfo() }
                 }
                 
                 VStack {
@@ -258,93 +226,80 @@ struct PropertyDetailView: View {
                                         .foregroundStyle(Color(Constant.Color.primaryText))
                                         .underline()
                                     Text("night")
-                                        .font(
-                                            .custom(Constant.Font.regular, size: 18)
-                                        )
+                                        .font(.custom(Constant.Font.regular, size: 18))
                                         .foregroundStyle(Color(Constant.Color.primaryText))
                                 }
-                                Text(
-                                    property.dateAvailable.getShortMonthDayFormat()
-                                )
-                                .font(.custom(Constant.Font.regular, size: 14))
-                                .foregroundStyle(
-                                    Color(Constant.Color.primaryText)
-                                )
+                                Text(property.dateAvailable.getShortMonthDayFormat())
+                                    .font(.custom(Constant.Font.regular, size: 14))
+                                    .foregroundStyle(Color(Constant.Color.primaryText))
                             }
-                            
                             Spacer()
                             MoreRoundedPrimaryButton(text: "Request") {
                                 navigateToRequestView()
                             }
                         }
                         .padding(.horizontal)
-                        .padding(.horizontal)
                     }
                     .background(Color.white)
                 }
-            }//end of ZStack
-            .background(ignoresSafeAreaEdges: .bottom)
-            .navigationDestination(isPresented: $toRequest) {
-                RequestView(property: property, tab: $tab)
-            }
-            .navigationDestination(isPresented: $toLogin) {
-                LoginView(tab: $tab)
             }
             .toolbar {
+                // Share and wishlist buttons (wishlist button appears only for guests)
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-//                        Button {
-//                            
-//                        } label: {
-//                            Image(systemName: "square.and.arrow.up")
-//                                .resizable()
-//                                .scaledToFit()
-//                                .frame(width: 14)
-//                                .foregroundStyle(Color(Constant.Color.primaryText))
-//                        }
-                        
-                        ShareLink(item: "\(property.title), $\(String(format: "%.2f", property.price)) CAD") {
+                        Button {
+                            // Share action here
+                        } label: {
                             Image(systemName: "square.and.arrow.up")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 14)
                                 .foregroundStyle(Color(Constant.Color.primaryText))
                         }
-                        
-                        Button {
-                            performAddToWishList(property: property)
-                        } label: {
-                            Image(systemName: isInWishlist ? "heart.fill" : "heart")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16)
-                                .foregroundStyle(isInWishlist ?
-                                                 Color(Constant.Color.primaryColor) :
-                                                    Color(Constant.Color.sencondaryText)
-                                )
-                        }
-                        .onAppear {
-                            updateWishlistState()
-                        }
-                        .onChange(of: userVM.user.wishList) { oldValue, newValue in
-                            updateWishlistState()
+                        if currentRole == "Guest" {
+                            Button {
+                                performAddToWishList()
+                            } label: {
+                                Image(systemName: isInWishlist ? "heart.fill" : "heart")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16)
+                                    .foregroundStyle(isInWishlist ?
+                                        Color(Constant.Color.primaryColor) :
+                                        Color(Constant.Color.sencondaryText))
+                            }
+                            .onAppear { updateWishlistState() }
+                            .onChange(of: userVM.user.wishList) { _, _ in updateWishlistState() }
                         }
                     }
                 }
-                
-            }
-            .toolbarBackground(.white, for: .automatic)
-            
-            .alert("Action Requires an Account", isPresented: $showLoginAlert) {
-                Button("Log In") {
-                    toLogin = true
+                // Conditional Edit button visible only in host mode
+                ToolbarItem(placement: .topBarTrailing) {
+                    if currentRole != "Guest" {
+                        Button("Edit") {
+                            toEdit = true
+                        }
+                        .foregroundStyle(Color(Constant.Color.primaryText))
+                    }
                 }
+            }
+            .navigationDestination(isPresented: $toRequest) {
+                RequestView(property: property, tab: $tab)
+            }
+            .navigationDestination(isPresented: $toLogin) {
+                LoginView(tab: $tab)
+            }
+            // Navigation to the edit screen for host mode
+            .navigationDestination(isPresented: $toEdit) {
+                PropertyEditView(property: property, isEditing: true)
+            }
+            .alert("Action Requires an Account", isPresented: $showLoginAlert) {
+                Button("Log In") { toLogin = true }
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("You need to have an account to perform this action. Please log in or sign up.")
             }
-        }//end of NavStack
-        
+        }
     }
 }
 

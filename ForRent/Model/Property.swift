@@ -18,6 +18,7 @@ struct Property: Codable, Hashable {
     var guest = 0
     var description = ""
     var imgURL = ""
+    var address: String = ""
     var isAvailable = true //-> false when approve request
     var isDelisted = false // only for owner to see when delisted = true -> user cannot see
     var price = 0.0
