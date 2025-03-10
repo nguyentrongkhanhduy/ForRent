@@ -25,42 +25,58 @@ struct WishlistView: View {
     ]
     
     private func performAddToWishList(property: Property) {
-            guard let propId = property.id else {
-                print("Error adding to wishlist")
-                return
-            }
-            userVM
-                .addOrRemoveToWishList(
-                    userId: authenticationVM.userID,
-                    propertyId: propId)
+        guard let propId = property.id else {
+            print("Error adding to wishlist")
+            return
+        }
+        userVM
+            .addOrRemoveToWishList(
+                userId: authenticationVM.userID,
+                propertyId: propId)
     }
     
     var body: some View {
         NavigationStack {
             VStack {
+                Text("Wishlist")
+                    .font(.custom(Constant.Font.semiBold, size: 30))
+                    .foregroundStyle(Color(Constant.Color.primaryText))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
                 if authenticationVM.isLoggedIn {
-                    ScrollView {
-                        Text("Wishlist")
-                            .font(.custom(Constant.Font.semiBold, size: 30))
-                            .foregroundStyle(Color(Constant.Color.primaryText))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                        
-                        if propertyVM.getWishlistProperties(wishList: userVM.user.wishList).isEmpty {
-                            Text("Empty")
-                                .font(.custom(Constant.Font.semiBold, size: 20))
-                                .foregroundStyle(Color(Constant.Color.sencondaryText))
-                        } else {
-                            LazyVGrid(columns: columns, spacing: 15) {
-                                ForEach(propertyVM.getWishlistProperties(wishList: userVM.user.wishList), id:\.self) { property in
-                                    WishlistItem(property: property) {
-                                        performAddToWishList(property: property)
-                                    }
-                                    .onTapGesture {
-                                        toDetailView = true
-                                        selectProperty = property
-                                    }
-                                }
+                    //                    ScrollView {
+                    //
+                    //                        if propertyVM.getWishlistProperties(wishList: userVM.user.wishList).isEmpty {
+                    //                            Text("Empty")
+                    //                                .font(.custom(Constant.Font.semiBold, size: 20))
+                    //                                .foregroundStyle(Color(Constant.Color.sencondaryText))
+                    //                        } else {
+                    //                            LazyVGrid(columns: columns, spacing: 15) {
+                    //                                ForEach(propertyVM.getWishlistProperties(wishList: userVM.user.wishList), id:\.self) { property in
+                    //                                    WishlistItem(property: property) {
+                    //                                        performAddToWishList(property: property)
+                    //                                    }
+                    //                                    .onTapGesture {
+                    //                                        toDetailView = true
+                    //                                        selectProperty = property
+                    //                                    }
+                    //                                }
+                    //                            }
+                    //                        }
+                    //                    }
+                    if propertyVM.getWishlistProperties(wishList: userVM.user.wishList).isEmpty {
+                        Text("Empty")
+                            .font(.custom(Constant.Font.semiBold, size: 20))
+                            .foregroundStyle(Color(Constant.Color.sencondaryText))
+                    }
+                    List {
+                        ForEach(propertyVM.getWishlistProperties(wishList: userVM.user.wishList), id:\.self) { property in
+                            WishlistItem(property: property) {
+                                performAddToWishList(property: property)
+                            }
+                            .onTapGesture {
+                                toDetailView = true
+                                selectProperty = property
                             }
                         }
                     }
@@ -71,6 +87,8 @@ struct WishlistView: View {
                         toSignupScreen = true
                     }
                 }
+                
+                Spacer()
             }//End of VStack
             .padding(.horizontal)
             .navigationDestination(isPresented: $toLoginScreen) {

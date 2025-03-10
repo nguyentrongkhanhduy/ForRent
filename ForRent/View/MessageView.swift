@@ -23,6 +23,12 @@ struct MessageView: View {
     var body: some View {
         NavigationStack {
             VStack {
+                Text("Messages")
+                    .font(.custom(Constant.Font.semiBold, size: 30))
+                    .foregroundStyle(Color(Constant.Color.primaryText))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                
                 if authenticationVM.isLoggedIn {
                     if currentRole == "Guest" {
                         // Tenant's messages (user requests)

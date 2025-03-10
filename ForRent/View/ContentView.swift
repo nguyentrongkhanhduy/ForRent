@@ -16,17 +16,6 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @AppStorage("currentRole") private var currentRole = "Guest"
     
-    private var toolBarTitle: String {
-        switch selectedTab {
-        case 0: return ""
-        case 1: return "Wishlist"
-        case 2: return "Messages"
-        case 3: return "Profile"
-        case 4: return "Your Listing"
-        default: return ""
-        }
-    }
-    
     var body: some View {
         TabView(selection: $selectedTab) {
             if !authenticationVM.isLoggedIn || currentRole == "Guest" {
@@ -71,6 +60,7 @@ struct ContentView: View {
             }
             .tag(3)
         }
+        .tint(Color(Constant.Color.primaryColor))
         .accentColor(Color(Constant.Color.primaryText))
     }
 }
