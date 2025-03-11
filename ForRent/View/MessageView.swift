@@ -17,6 +17,8 @@ struct MessageView: View {
     @AppStorage("currentRole") private var currentRole: String = "Guest"
     @State private var toLoginScreen = false
     @State private var toSignupScreen = false
+    @State private var role = "All"
+    @State private var status = "All"
 
     @Binding var tab: Int
 
@@ -28,6 +30,8 @@ struct MessageView: View {
                     .foregroundStyle(Color(Constant.Color.primaryText))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
+                
+                RequestFilterBar(role: $role, status: $status)
                 
                 if authenticationVM.isLoggedIn {
                     if currentRole == "Guest" {
@@ -49,10 +53,9 @@ struct MessageView: View {
                                         RequestRow(request: request)
                                     }
                                     .listRowSeparator(.hidden)
-                                    .padding(.bottom, 30)
+                                    .padding(.bottom)
                                 }
                             }
-                            .padding(.vertical, 30)
                             .listStyle(.plain)
                         }
                     } else {

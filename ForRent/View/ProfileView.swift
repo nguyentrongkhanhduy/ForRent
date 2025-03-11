@@ -214,7 +214,7 @@ struct ProfileView: View {
                             VStack {
                                 Spacer()
                                 MoreRoundedButton(
-                                    text: "Switch to \(currentRole == "Guest" ? "hosting" : "traveling")",
+                                    text: "Switch to \(currentRole == "Guest" ? "hosting" : "travelling")",
                                     systemImgString: "arrow.trianglehead.swap"
                                 ) {
                                     if currentRole == "Guest" {

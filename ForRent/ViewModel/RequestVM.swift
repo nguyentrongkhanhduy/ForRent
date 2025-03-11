@@ -16,12 +16,79 @@ class RequestVM {
     
     var listUserRequest = [Request]()
     var listOwnerRequest = [Request]()
+    var listRequest = [Request]()
     
     private var db: Firestore {
         return Firestore.firestore()
     }
     
     private init() {}
+    
+    func fetchAllRequest() {
+        db.collection("requests")
+            .addSnapshotListener { snapshot, error in
+                if let error = error {
+                    print("Error fetching user requests: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let snapshot = snapshot else {
+                    print("No user requests found")
+                    return
+                }
+                
+                for change in snapshot.documentChanges {
+                    do {
+                        let request = try change.document.data(as: Request.self)
+                        switch change.type {
+                        case .added:
+                            if !self.listRequest.contains(where: { $0.id == request.id }) {
+                                self.listRequest.append(request)
+                            }
+                        case .modified:
+                            if let index = self.listRequest.firstIndex(where: { $0.id == request.id }) {
+                                self.listRequest[index] = request
+                            }
+                        case .removed:
+                            self.listRequest.removeAll { $0.id == request.id }
+                        }
+                    } catch {
+                        print("Error decoding user request: \(error.localizedDescription)")
+                    }
+                }
+            }
+    }
+    
+    func filterRequest(userId: String ,role: String, status: String) -> [Request] {
+        switch role {
+        case "All":
+            return self.listRequest.filter { request in
+                request.ownerId == userId || request.userId == userId
+            }
+        case "Hosting":
+            if status == "All" {
+                return self.listRequest.filter { request in
+                    request.ownerId == userId
+                }
+            } else {
+                return self.listRequest.filter { request in
+                    request.ownerId == userId && request.status == status
+                }
+            }
+        case "Travelling":
+            if status == "All" {
+                return self.listRequest.filter { request in
+                    request.userId == userId
+                }
+            } else {
+                return self.listRequest.filter { request in
+                    request.userId == userId && request.status == status
+                }
+            }
+        default:
+            return []
+        }
+    }
     
     func fetchAllOwnerRequest(ownerId: String) {
         db.collection("requests")
