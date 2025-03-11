@@ -33,7 +33,7 @@ struct PropertyDetailView: View {
     // New state to trigger edit navigation
     @State private var toEdit = false
 
-    var property: Property
+    @State var property: Property
     @Binding var tab: Int
     
     private func navigateToRequestView() {
@@ -197,8 +197,6 @@ struct PropertyDetailView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         
-                        Divider().padding(.horizontal)
-                        
                         VStack(alignment: .leading) {
                             Text("Availability")
                                 .font(.custom(Constant.Font.semiBold, size: 20))
@@ -234,8 +232,26 @@ struct PropertyDetailView: View {
                                     .foregroundStyle(Color(Constant.Color.primaryText))
                             }
                             Spacer()
-                            MoreRoundedPrimaryButton(text: "Request") {
-                                navigateToRequestView()
+
+                            // Show "Request" button only for guests
+                            if currentRole == "Guest" && !property.isDelisted {
+                                MoreRoundedPrimaryButton(text: "Request") {
+                                    navigateToRequestView()
+                                }
+                            }
+
+                            // Define a nice green color for "List Property"
+                            let listColor = Color.green.opacity(0.8)
+                            let delistColor = Color.red.opacity(0.8)
+
+                            // Show "Delist/Relist" button for hosts
+                            if currentRole != "Guest" {
+                                MoreRoundedButton(
+                                    text: property.isDelisted ? "List Property" : "Delist Property",
+                                    backgroundColor: property.isDelisted ? listColor : delistColor
+                                ) {
+                                    toggleDelistStatus()
+                                }
                             }
                         }
                         .padding(.horizontal)
@@ -273,7 +289,6 @@ struct PropertyDetailView: View {
                         }
                     }
                 }
-                // Conditional Edit button visible only in host mode
                 ToolbarItem(placement: .topBarTrailing) {
                     if currentRole != "Guest" {
                         Button("Edit") {
@@ -298,6 +313,24 @@ struct PropertyDetailView: View {
                 Button("Cancel", role: .cancel) { }
             } message: {
                 Text("You need to have an account to perform this action. Please log in or sign up.")
+            }
+        }
+    }
+
+    // MARK: - Toggle Delist Status
+
+    private func toggleDelistStatus() {
+        guard let propId = property.id else { return }
+        
+        let newStatus = !property.isDelisted // Toggle the status
+
+        propertyVM.updatePropertyStatus(propertyId: propId, isDelisted: newStatus) { success in
+            if success {
+                DispatchQueue.main.async {
+                    property.isDelisted = newStatus
+                }
+            } else {
+                print("Failed to update property delist status.")
             }
         }
     }

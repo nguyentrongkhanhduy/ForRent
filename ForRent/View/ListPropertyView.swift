@@ -57,7 +57,8 @@ struct ListPropertyView: View {
                                     bed: filterCriteria.selectedBed,
                                     guest: filterCriteria.selectedGuest,
                                     date: filterCriteria.selectedDate
-                                ),
+                                )
+                                .filter { !$0.isDelisted },
                             id: \.self
                         ) { property in
                             ListItem(property: property) {
@@ -119,11 +120,11 @@ struct ListPropertyView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var test = 1
-    ListPropertyView(tab: $test)
-        .environment(AuthenticationVM.shared)
-        .environment(UserVM.shared)
-        .environment(PropertyVM.shared)
-        .environment(LocationVM.shared)
-}
+//#Preview {
+//    @Previewable @State var test = 1
+//    ListPropertyView(tab: $test)
+//        .environment(AuthenticationVM.shared)
+//        .environment(UserVM.shared)
+//        .environment(PropertyVM.shared)
+//        .environment(LocationVM.shared)
+//}

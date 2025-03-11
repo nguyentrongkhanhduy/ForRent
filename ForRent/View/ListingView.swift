@@ -18,20 +18,43 @@ struct ListingView: View {
     @State private var isAddingNew = false
     @State private var showLoginAlert = false
     @State private var toLogin = false
+
+    // New state for filtering listed vs. delisted properties
+    @State private var isShowingListed: Bool = true
     
     var body: some View {
         NavigationStack {
             VStack {
-                Text("Your listing")
-                    .font(.custom(Constant.Font.semiBold, size: 30))
-                    .foregroundStyle(Color(Constant.Color.primaryText))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
+                
+                HStack {
+                    Text("Your Listings")
+                        .font(.custom(Constant.Font.semiBold, size: 30))
+                        .foregroundStyle(Color(Constant.Color.primaryText))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    
+                    Button {
+                        isAddingNew = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .imageScale(.large)
+                    }
+                    .padding()
+                }
+
+                // Toggle filter between Listed & Delisted properties
+                Picker("Filter", selection: $isShowingListed) {
+                    Text("Listed").tag(true)
+                    Text("Delisted").tag(false)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal)
                 
                 List {
-                    // Filter properties so that only those owned by the current user (host) are shown.
+                    // Correct filtering for Listed and Delisted properties
                     ForEach(
-                        propertyVM.listProperty.filter { $0.ownerId == authenticationVM.userID },
+                        propertyVM.listProperty
+                            .filter { $0.ownerId == authenticationVM.userID && $0.isDelisted == !isShowingListed },
                         id: \.self
                     ) { property in
                         ListItem(property: property) {
@@ -46,22 +69,11 @@ struct ListingView: View {
                         }
                     }
                 }
+                .padding(.bottom)
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
             }
             
-            
-            
-            
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    Button {
-//                        isAddingNew = true
-//                    } label: {
-//                        Image(systemName: "plus")
-//                    }
-//                }
-//            }
             .navigationDestination(isPresented: $isAddingNew) {
                 // Create a new property with default values.
                 PropertyEditView(
@@ -96,12 +108,12 @@ struct ListingView: View {
     }
 }
 
-#Preview {
-    @Previewable @State var test = 1
-    ListingView(tab: $test)
-        .environment(AuthenticationVM.shared)
-        .environment(UserVM.shared)
-        .environment(PropertyVM.shared)
-        .environment(LocationVM.shared)
-        .environment(RequestVM.shared)
-}
+//#Preview {
+//    @Previewable @State var test = 1
+//    ListingView(tab: $test)
+//        .environment(AuthenticationVM.shared)
+//        .environment(UserVM.shared)
+//        .environment(PropertyVM.shared)
+//        .environment(LocationVM.shared)
+//        .environment(RequestVM.shared)
+//}

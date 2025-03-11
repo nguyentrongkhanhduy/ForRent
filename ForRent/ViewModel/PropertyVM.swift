@@ -27,8 +27,7 @@ class PropertyVM {
     func fetchAllProperty() {
         db
             .collection("properties")
-            .whereField("isAvailable", isEqualTo: true)
-            .whereField("isDelisted", isEqualTo: false).addSnapshotListener {
+            .whereField("isAvailable", isEqualTo: true).addSnapshotListener {
                 snapshot,
                 error in
                 if error != nil {
@@ -147,6 +146,19 @@ extension PropertyVM {
         } catch {
             print("Error encoding property: \(error.localizedDescription)")
             completion(false)
+        }
+    }
+    
+    func updatePropertyStatus(propertyId: String, isDelisted: Bool, completion: @escaping (Bool) -> Void) {
+        let propertyRef = Firestore.firestore().collection("properties").document(propertyId)
+        
+        propertyRef.updateData(["isDelisted": isDelisted]) { error in
+            if let error = error {
+                print("Error updating property status: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                completion(true)
+            }
         }
     }
 }

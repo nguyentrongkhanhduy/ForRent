@@ -5,6 +5,7 @@
 //  Created by wang zexi on 3/10/25.
 //
 
+
 import SwiftUI
 import FirebaseFirestore
 import CoreLocation
@@ -15,7 +16,6 @@ struct PropertyEditView: View {
     @Environment(PropertyVM.self) var propertyVM
     @Environment(AuthenticationVM.self) var authenticationVM
 
-    // The property being edited or created.
     @State var property: Property
     let isEditing: Bool
 
@@ -23,13 +23,12 @@ struct PropertyEditView: View {
     @State private var errorMessage = ""
     @State private var showErrorAlert = false
 
-    // New state for the selected coordinate (based on the entered address).
     @State private var selectedCoordinate: CLLocationCoordinate2D
-
-    // CLGeocoder instance to convert address into coordinates.
     let geocoder = CLGeocoder()
 
-    // Computed property for the map region.
+    // Validation State
+    @State private var validationErrors: [String] = []
+
     private var currentRegion: MKCoordinateRegion {
         let latDelta: CLLocationDegrees = 0.01
         let longDelta: CLLocationDegrees = 0.01
@@ -40,7 +39,6 @@ struct PropertyEditView: View {
     init(property: Property, isEditing: Bool) {
         self._property = State(initialValue: property)
         self.isEditing = isEditing
-        // Initialize selectedCoordinate from the property's current coordinate.
         _selectedCoordinate = State(initialValue: property.coordinate2D)
     }
 
@@ -75,10 +73,22 @@ struct PropertyEditView: View {
     private var detailsSection: some View {
         Section(header: Text("Property Details")) {
             TextField("Title", text: $property.title)
+                .border(validationErrors.contains("title") ? Color.red : Color.clear)
+            TextField("Overview", text: $property.overview)
+                .border(validationErrors.contains("overview") ? Color.red : Color.clear)
             TextEditor(text: $property.description)
                 .frame(height: 100)
-            TextField("Price (per night)", value: $property.price, format: .number)
-                .keyboardType(.decimalPad)
+                .border(validationErrors.contains("description") ? Color.red : Color.clear)
+            HStack {
+                Text("Price per night:")
+                    .font(.custom(Constant.Font.regular, size: 16))
+                    .foregroundColor(.primary)
+
+                TextField("Enter price", value: $property.price, format: .number)
+                    .keyboardType(.decimalPad)
+                    .textFieldStyle(.roundedBorder)
+                    .border(validationErrors.contains("price") ? Color.red : Color.clear)
+            }
             Stepper("Bedrooms: \(property.bedroom)", value: $property.bedroom, in: 0...10)
             Stepper("Bathrooms: \(property.bathroom)", value: $property.bathroom, in: 0...10)
             Stepper("Guests: \(property.guest)", value: $property.guest, in: 1...20)
@@ -89,6 +99,7 @@ struct PropertyEditView: View {
     private var addressSection: some View {
         Section(header: Text("Property Address")) {
             TextField("Enter property address", text: $property.address)
+                .border(validationErrors.contains("address") ? Color.red : Color.clear)
                 .onChange(of: property.address) { newAddress, _ in
                     if !newAddress.isEmpty {
                         geocoder.geocodeAddressString(newAddress) { placemarks, error in
@@ -109,7 +120,6 @@ struct PropertyEditView: View {
                     Spacer()
                     Text("Long: \(String(format: "%.4f", selectedCoordinate.longitude))")
                 }
-                // Breaking up the expression using a local constant.
                 let region = currentRegion
                 MapPreviewView(region: region)
             }
@@ -120,14 +130,16 @@ struct PropertyEditView: View {
         Section(header: Text("Image URL")) {
             TextField("Image URL", text: $property.imgURL)
                 .keyboardType(.URL)
+                .border(validationErrors.contains("imgURL") ? Color.red : Color.clear)
         }
     }
 
-    // Updated computed property for the toolbar.
+    // MARK: - Toolbar
+
     private var saveToolbar: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
             Button("Save") {
-                saveProperty()
+                validateAndSave()
             }
             .disabled(isSaving)
         }
@@ -142,15 +154,45 @@ struct PropertyEditView: View {
             .progressViewStyle(CircularProgressViewStyle())
     }
 
-    // MARK: - Save Function
+    // MARK: - Validation & Save
+
+    func validateAndSave() {
+        validationErrors.removeAll()
+
+        // Check if required fields are empty
+        if property.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            validationErrors.append("title")
+        }
+        if property.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            validationErrors.append("description")
+        }
+        if property.price <= 0 {
+            validationErrors.append("price")
+        }
+        if property.address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            validationErrors.append("address")
+        }
+        if property.imgURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            validationErrors.append("imgURL")
+        }
+        if property.overview.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            validationErrors.append("overview")
+        }
+
+        if validationErrors.isEmpty {
+            saveProperty()
+        } else {
+            errorMessage = "Please fill in all required fields."
+            showErrorAlert = true
+        }
+    }
 
     func saveProperty() {
         isSaving = true
-        // Ensure the ownerId is set.
         property.ownerId = authenticationVM.userID
-        // Update the property's coordinate using the selectedCoordinate.
         property.coordinate = FirebaseFirestore.GeoPoint(latitude: selectedCoordinate.latitude,
                                                          longitude: selectedCoordinate.longitude)
+
         if isEditing {
             propertyVM.updateProperty(property: property) { success in
                 isSaving = false
@@ -179,7 +221,6 @@ struct PropertyEditView: View {
 struct MapPreviewView: View {
     let region: MKCoordinateRegion
     var body: some View {
-        // Provide annotationItems to display a marker.
         Map(
             coordinateRegion: .constant(region),
             annotationItems: [DummyAnnotation(coordinate: region.center)]

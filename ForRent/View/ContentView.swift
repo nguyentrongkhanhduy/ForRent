@@ -53,17 +53,6 @@ struct ContentView: View {
                     .tag(3)
             }
             .tint(Color(Constant.Color.primaryColor))
-            .toolbar {
-                if selectedTab == 4 {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            //                                    isAddingNew = true
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-                    }
-                }
-            }
         }
         .accentColor(Color(Constant.Color.primaryText))
     }
