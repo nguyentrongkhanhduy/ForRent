@@ -11,17 +11,21 @@ struct RequestFilterBar: View {
     @Binding var role: String
     @Binding var status: String
     let roleOptions = ["All", "Travelling", "Hosting"]
-//    let statusOptions = ["All", "Pending", "Approved", "Denied", "Cancelled"]
+    let statusOptions = ["Pending", "Approved", "Denied", "Cancelled"]
     
+    // Define equal spacing for status buttons
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 4)
+
     var body: some View {
-        VStack {
+        VStack(spacing: 6) { // Reduce vertical spacing
             HStack {
+                // Role Selection
                 Menu {
-                    ForEach(roleOptions, id:\.self) { role in
+                    ForEach(roleOptions, id: \.self) { option in
                         Button {
-                            self.role = role
+                            self.role = option
                         } label: {
-                            Text(role)
+                            Text(option)
                         }
                     }
                 } label: {
@@ -32,7 +36,7 @@ struct RequestFilterBar: View {
                         Image(systemName: "chevron.down")
                             .foregroundColor(.gray)
                     }
-                    .padding(10)
+                    .padding(8)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
                             .fill(role == "All" ? .white : .black)
@@ -43,77 +47,34 @@ struct RequestFilterBar: View {
             }
             .padding(.horizontal)
             
-            HStack{
-                Button {
-                    status = "Pending"
-                } label: {
-                    Text("Pending")
-                        .font(.custom(Constant.Font.semiBold, size: 14))
-                        .foregroundStyle(status != "Pending" ? .black : .white)
-                        .padding(10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(status != "Pending" ? .white : .black)
-                                .stroke(Color.black)
-                                
-                        )
+            // Status Buttons Aligned with List Width
+            if role != "All" {
+                LazyVGrid(columns: columns, spacing: 6) { // Even spacing
+                    ForEach(statusOptions, id: \.self) { option in
+                        Button {
+                            status = option
+                        } label: {
+                            Text(option)
+                                .font(.custom(Constant.Font.semiBold, size: 14))
+                                .foregroundStyle(status == option ? .white : .black)
+                                .padding(.vertical, 8)
+                                .frame(maxWidth: .infinity) // Make all buttons equal width
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(status == option ? .black : .white)
+                                        .stroke(Color.black)
+                                )
+                        }
+                    }
                 }
-                
-                Spacer()
-                
-                Button {
-                    status = "Approved"
-                } label: {
-                    Text("Approved")
-                        .font(.custom(Constant.Font.semiBold, size: 14))
-                        .foregroundStyle(status != "Approved" ? .black : .white)
-                        .padding(10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(status != "Approved" ? .white : .black)
-                                .stroke(Color.black)
-                        )
-                }
-                
-                Spacer()
-                
-                Button {
-                    status = "Denied"
-                } label: {
-                    Text("Denied")
-                        .font(.custom(Constant.Font.semiBold, size: 14))
-                        .foregroundStyle(status != "Denied" ? .black : .white)
-                        .padding(10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(status != "Denied" ? .white : .black)
-                                .stroke(Color.black)
-                        )
-                }
-                
-                Spacer()
-                
-                Button {
-                    status = "Cancelled"
-                } label: {
-                    Text("Cancelled")
-                        .font(.custom(Constant.Font.semiBold, size: 14))
-                        .foregroundStyle(status != "Cancelled" ? .black : .white)
-                        .padding(10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(status != "Cancelled" ? .white : .black)
-                                .stroke(Color.black)
-                        )
-                }
+                .padding(.horizontal, 16) // Aligns with list width
+                .padding(.top, 4)
+                .padding(.bottom, 4)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.3), value: role)
             }
-            .padding(.horizontal)
-            .opacity(role == "All" ? 0 : 1)
-            .animation(.easeInOut(duration: 0.3), value: role)
-
-            
         }
-        .onChange(of: role) { oldValue, newValue in
+        .onChange(of: role) { _, _ in
             status = "All"
         }
     }

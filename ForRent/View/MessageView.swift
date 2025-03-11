@@ -22,6 +22,10 @@ struct MessageView: View {
 
     @Binding var tab: Int
 
+    var filteredRequests: [Request] {
+        requestVM.filterRequest(userId: authenticationVM.userID, role: role, status: status)
+    }
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -34,56 +38,27 @@ struct MessageView: View {
                 RequestFilterBar(role: $role, status: $status)
                 
                 if authenticationVM.isLoggedIn {
-                    if currentRole == "Guest" {
-                        // Tenant's messages (user requests)
-                        if requestVM.listUserRequest.isEmpty {
-                            VStack {
-                                Text("No messages yet.")
-                                    .font(.custom(Constant.Font.semiBold, size: 20))
-                                    .foregroundStyle(Color(Constant.Color.sencondaryText))
-                                Spacer()
-                            }
-                            .padding(30)
-                        } else {
-                            List {
-                                ForEach(requestVM.listUserRequest, id: \.self) { request in
-                                    NavigationLink {
-                                        RequestCancelView(tab: $tab, request: request)
-                                    } label: {
-                                        RequestRow(request: request)
-                                    }
-                                    .listRowSeparator(.hidden)
-                                    .padding(.bottom)
-                                }
-                            }
-                            .listStyle(.plain)
+                    if filteredRequests.isEmpty {
+                        VStack {
+                            Text("No matching requests.")
+                                .font(.custom(Constant.Font.semiBold, size: 20))
+                                .foregroundStyle(Color(Constant.Color.sencondaryText))
+                            Spacer()
                         }
+                        .padding(30)
                     } else {
-                        // Host's messages (owner requests)
-                        if requestVM.listOwnerRequest.isEmpty {
-                            VStack {
-                                Text("No incoming requests.")
-                                    .font(.custom(Constant.Font.semiBold, size: 20))
-                                    .foregroundStyle(Color(Constant.Color.sencondaryText))
-                                Spacer()
-                            }
-                            .padding(30)
-                        } else {
-                            List {
-                                ForEach(requestVM.listOwnerRequest, id: \.self) { request in
-                                    NavigationLink {
-                                        // Navigate to the host's RequestView.
-                                        RequestCancelView(tab: $tab, request: request)
-                                    } label: {
-                                        RequestRow(request: request)
-                                    }
-                                    .listRowSeparator(.hidden)
-                                    .padding(.bottom, 30)
+                        List {
+                            ForEach(filteredRequests, id: \.self) { request in
+                                NavigationLink {
+                                    RequestCancelView(tab: $tab, request: request)
+                                } label: {
+                                    RequestRow(request: request)
                                 }
+                                .listRowSeparator(.hidden)
+                                .padding(.bottom)
                             }
-                            .padding(.vertical, 30)
-                            .listStyle(.plain)
                         }
+                        .listStyle(.plain)
                     }
                 } else {
                     TemporaryViewForLogin(screenId: 2) {
@@ -101,11 +76,7 @@ struct MessageView: View {
                 SignupView(tab: $tab)
             }
             .onAppear {
-                if currentRole == "Guest" {
-                    requestVM.fetchAllUserRequest(userId: authenticationVM.userID)
-                } else {
-                    requestVM.fetchAllOwnerRequest(ownerId: authenticationVM.userID)
-                }
+                requestVM.fetchAllRequest()
             }
         }
     }
