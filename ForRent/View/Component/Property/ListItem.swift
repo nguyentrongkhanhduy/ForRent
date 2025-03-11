@@ -19,7 +19,7 @@ struct ListItem: View {
     var body: some View {
         ZStack {
             VStack {
-                SquareImage(imgURL: property.imgURL, size: 350, radius: 10)
+                SquareImage(imgURL: property.imgURL, size: 350, radius: 16)
                 
                 VStack(alignment: .leading) {
                     Text(property.title)

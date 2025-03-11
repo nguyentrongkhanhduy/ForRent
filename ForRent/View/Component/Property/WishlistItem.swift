@@ -15,28 +15,35 @@ struct WishlistItem: View {
         
         VStack {
             ZStack {
-                SquareImage(imgURL: property.imgURL, size: 160, radius: 20)
+                SquareImage(imgURL: property.imgURL, size: 350, radius: 16)
                 
                 HStack {
                     Spacer()
                     FavouriteButton(property: property) {
                         addtoWishlist()
                     }
-                    .padding(.trailing)
-                    .padding(.bottom, 110)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 300)
                 }
-                .frame(width: 160)
+                .frame(width: 350)
             }
             
-            Text(property.title)
-                .frame(width: 160, alignment: .leading)
-                .font(.custom(Constant.Font.semiBold, size: 16))
-                .foregroundStyle(Color(Constant.Color.primaryText))
+            VStack(alignment: .leading) {
+                Text(property.title)
+                    .frame(width: 350, alignment: .leading)
+                    .font(.custom(Constant.Font.semiBold, size: 16))
+                    .foregroundStyle(Color(Constant.Color.primaryText))
+                
+                Text(property.overview)
+                    .frame(width: 350, alignment: .leading)
+                    .font(.custom(Constant.Font.regular, size: 15))
+                    .foregroundStyle(Color(Constant.Color.sencondaryText))
+                Text("\(property.bedroom) \(property.bedroom > 1 ? "beds" : "bed")")
+                    .frame(width: 350, alignment: .leading)
+                    .font(.custom(Constant.Font.regular, size: 15))
+                    .foregroundStyle(Color(Constant.Color.sencondaryText))
+            }
             
-            Text("\(property.bedroom) \(property.bedroom > 1 ? "beds" : "bed")")
-                .frame(width: 160, alignment: .leading)
-                .font(.custom(Constant.Font.regular, size: 15))
-                .foregroundStyle(Color(Constant.Color.sencondaryText))
         }
         
         

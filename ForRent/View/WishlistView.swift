@@ -45,26 +45,6 @@ struct WishlistView: View {
                     .padding(.vertical)
                 
                 if authenticationVM.isLoggedIn {
-                    //                    ScrollView {
-                    //
-                    //                        if propertyVM.getWishlistProperties(wishList: userVM.user.wishList).isEmpty {
-                    //                            Text("Empty")
-                    //                                .font(.custom(Constant.Font.semiBold, size: 20))
-                    //                                .foregroundStyle(Color(Constant.Color.sencondaryText))
-                    //                        } else {
-                    //                            LazyVGrid(columns: columns, spacing: 15) {
-                    //                                ForEach(propertyVM.getWishlistProperties(wishList: userVM.user.wishList), id:\.self) { property in
-                    //                                    WishlistItem(property: property) {
-                    //                                        performAddToWishList(property: property)
-                    //                                    }
-                    //                                    .onTapGesture {
-                    //                                        toDetailView = true
-                    //                                        selectProperty = property
-                    //                                    }
-                    //                                }
-                    //                            }
-                    //                        }
-                    //                    }
                     if propertyVM.getWishlistProperties(wishList: userVM.user.wishList).isEmpty {
                         Text("Empty")
                             .font(.custom(Constant.Font.semiBold, size: 20))
@@ -79,8 +59,10 @@ struct WishlistView: View {
                                 toDetailView = true
                                 selectProperty = property
                             }
+                            .listRowSeparator(.hidden)
                         }
                     }
+                    .listStyle(.plain)
                 } else {
                     TemporaryViewForLogin(screenId: 1) {
                         toLoginScreen = true
