@@ -34,7 +34,7 @@ struct RequestView: View {
         
         let components = calendar.dateComponents([.day], from: startDate, to: endDate)
         
-        return max(components.day! + 1, 1)
+        return components.day!
     }
     
     private func performAddRequest() {
@@ -105,7 +105,7 @@ struct RequestView: View {
                                 DatePicker(
                                     "",
                                     selection: $endDate,
-                                    in: startDate...,
+                                    in: Calendar.current.date(byAdding: .day, value: 1, to: startDate)!...,
                                     displayedComponents: [.date]
                                 )
                                 .datePickerStyle(.compact)
@@ -313,7 +313,7 @@ struct RequestView: View {
             }// end of scroll view
             .onAppear(perform: {
                 startDate = property.dateAvailable
-                endDate = startDate
+                endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
             })
             .navigationBarBackButtonHidden()
             .toolbar {
