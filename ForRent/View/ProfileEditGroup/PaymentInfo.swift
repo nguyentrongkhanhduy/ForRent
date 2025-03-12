@@ -79,13 +79,18 @@ struct PaymentInfo: View {
                         bindingText: $newCardNumber
                     )
                     .keyboardType(.numberPad)
+                    .onChange(of: newCardNumber) { oldValue, newValue in
+                        if newValue.count > 10 {
+                            newCardNumber = String(newValue.prefix(10))
+                        }
+                    }
                 }
             }
             .padding(.top, 20)
             
             Spacer()
             
-            if isValidCardNumber {
+            if isValidCardNumber && !isDisableTextField {
                 PrimaryButton(text: "Update") {
                     performUpdatePaymentMethod()
                 }
