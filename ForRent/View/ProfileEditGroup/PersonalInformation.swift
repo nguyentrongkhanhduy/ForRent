@@ -134,6 +134,11 @@ struct PersonalInformation: View {
                             ) : Color.clear
                         )
                 )
+                .onChange(of: userVM.user.phone) { oldValue, newValue in
+                    if newValue.count > 10 {
+                        userVM.user.phone = String(newValue.prefix(10))
+                    }
+                }
             }
             .padding(.top, 10)
             
