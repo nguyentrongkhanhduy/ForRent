@@ -263,16 +263,15 @@ struct PropertyDetailView: View {
                 // Share and wishlist buttons (wishlist button appears only for guests)
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        Button {
-                            // Share action here
-                        } label: {
-                            Image(systemName: "square.and.arrow.up")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 14)
-                                .foregroundStyle(Color(Constant.Color.primaryText))
-                        }
                         if currentRole == "Guest" {
+                            ShareLink(item: "\(property.title), $\(String(format: "%.2f", property.price)) CAD") {
+                                Image(systemName: "square.and.arrow.up")
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                                .frame(width: 14)
+                                                                .foregroundStyle(Color(Constant.Color.primaryText))
+                            }
+                            
                             Button {
                                 performAddToWishList()
                             } label: {
