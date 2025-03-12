@@ -137,14 +137,12 @@ struct RequestCancelView: View {
                                     showAlert = true
                                     alertTitle = "Approve Request"
                                     alertMessage = "Are you sure you want to approve this request?"
-                                    approveRequest()
                                 }
                                 .padding()
                                 SecondaryButton(text: "Deny Request") {
                                     showAlert = true
                                     alertTitle = "Deny Request"
                                     alertMessage = "Are you sure you want to deny this request?"
-                                    denyRequest()
                                 }
                                 .padding()
                             }
@@ -161,6 +159,16 @@ struct RequestCancelView: View {
                                     
                                 }
                                 .padding()
+                            } else if curStatus == "Denied" {
+                                SecondaryButton(text: "Request Denied") {
+                                    
+                                }
+                                .padding()
+                            } else if curStatus == "Approved" {
+                                SecondaryButton(text: "Request Approved") {
+                                    
+                                }
+                                .padding()
                             }
                         }
                         
@@ -170,11 +178,20 @@ struct RequestCancelView: View {
                 .padding(.bottom, 30)
             }
             .alert(alertTitle, isPresented: $showAlert) {
-                Button("Ok", role: .cancel) {
-                    if alertTitle == "Success" {
-                        dismiss()
-                        tab = 2
+                if alertTitle == "Approve Request" || alertTitle == "Deny Request" || alertTitle == "Cancel Request" {
+                    Button("Cancel", role: .cancel) { } // This appears only for confirmation alerts
+                    Button("OK", role: .destructive) {
+                        if alertTitle == "Approve Request" {
+                            approveRequest()
+                        } else if alertTitle == "Deny Request" {
+                            denyRequest()
+                        } else if alertTitle == "Cancel Request" {
+                            cancelRequest()
+                        }
                     }
+                } else {
+                    // Success/Error alerts → Only OK button, no Cancel
+                    Button("OK", role: .cancel) { }
                 }
             } message: {
                 Text(alertMessage)
@@ -208,17 +225,14 @@ struct RequestCancelView: View {
         guard let reqId = request.id, !reqId.isEmpty else { return }
         requestVM.approveRequest(requestId: reqId) { success in
             if success {
-                // If the property is available, update its available date.
+                curStatus = "Approved"
                 if var currentProperty = property {
                     currentProperty.dateAvailable = request.dateEnd
                     propertyVM.updateProperty(property: currentProperty) { updateSuccess in
-                        if updateSuccess {
-                            alertTitle = "Success"
-                            alertMessage = "Request approved and property availability updated."
-                        } else {
-                            alertTitle = "Success"
-                            alertMessage = "Request approved, but failed to update property availability."
-                        }
+                        alertTitle = "Success"
+                        alertMessage = updateSuccess ?
+                            "Request approved and property availability updated." :
+                            "Request approved, but failed to update property availability."
                         showAlert = true
                     }
                 } else {
@@ -233,34 +247,35 @@ struct RequestCancelView: View {
             }
         }
     }
+
     
     func denyRequest() {
         guard let reqId = request.id, !reqId.isEmpty else { return }
         requestVM.denyRequest(requestId: reqId) { success in
             if success {
+                curStatus = "Denied"
                 alertTitle = "Success"
                 alertMessage = "Request denied successfully."
-                showAlert = true
             } else {
                 alertTitle = "Error"
                 alertMessage = "Failed to deny request."
-                showAlert = true
             }
+            showAlert = true
         }
     }
-    
+
     func cancelRequest() {
         guard let reqId = request.id, !reqId.isEmpty else { return }
         requestVM.cancelRequest(requestId: reqId) { success in
             if success {
+                curStatus = "Cancelled"
                 alertTitle = "Success"
                 alertMessage = "Request cancelled successfully."
-                showAlert = true
             } else {
                 alertTitle = "Error"
                 alertMessage = "Failed to cancel request."
-                showAlert = true
             }
+            showAlert = true
         }
     }
 }

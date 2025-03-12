@@ -69,6 +69,7 @@ struct MessageView: View {
                     .padding(.horizontal)
                 }
             }
+            .padding(.bottom)
             .navigationDestination(isPresented: $toLoginScreen) {
                 LoginView(tab: $tab)
             }

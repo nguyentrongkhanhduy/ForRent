@@ -22,9 +22,12 @@ struct ListingView: View {
     // New state for filtering listed vs. delisted properties
     @State private var isShowingListed: Bool = true
     
+    // Search bar state
+    @State private var searchText: String = ""
+
     var body: some View {
         NavigationStack {
-            VStack {
+            VStack(spacing: 8) {
                 
                 HStack {
                     Text("Your Listings")
@@ -42,6 +45,12 @@ struct ListingView: View {
                     .padding()
                 }
 
+                // Search Bar
+                TextField("Search by title...", text: $searchText)
+                    .padding(10)
+                    .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray6)))
+                    .padding(.horizontal)
+
                 // Toggle filter between Listed & Delisted properties
                 Picker("Filter", selection: $isShowingListed) {
                     Text("Listed").tag(true)
@@ -54,7 +63,8 @@ struct ListingView: View {
                     // Correct filtering for Listed and Delisted properties
                     ForEach(
                         propertyVM.listProperty
-                            .filter { $0.ownerId == authenticationVM.userID && $0.isDelisted == !isShowingListed },
+                            .filter { $0.ownerId == authenticationVM.userID && $0.isDelisted == !isShowingListed }
+                            .filter { searchText.isEmpty || $0.title.localizedCaseInsensitiveContains(searchText) },
                         id: \.self
                     ) { property in
                         ListItem(property: property) {

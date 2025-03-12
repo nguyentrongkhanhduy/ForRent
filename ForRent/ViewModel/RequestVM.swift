@@ -207,7 +207,54 @@ class RequestVM {
     }
     
     func approveRequest(requestId: String, completion: @escaping (Bool) -> Void) {
-        updateRequestStatus(requestId: requestId, status: "Approved", completion: completion)
+        // First, update the status of the request to "Approved"
+        updateRequestStatus(requestId: requestId, status: "Approved") { success in
+            if success {
+                // Fetch the approved request details
+                self.db.collection("requests").document(requestId).getDocument { snapshot, error in
+                    guard let snapshot = snapshot, snapshot.exists,
+                          let approvedRequest = try? snapshot.data(as: Request.self) else {
+                        print("Error fetching approved request details: \(error?.localizedDescription ?? "Unknown error")")
+                        completion(false)
+                        return
+                    }
+
+                    // Get all pending requests for the same property
+                    self.db.collection("requests")
+                        .whereField("propertyId", isEqualTo: approvedRequest.propertyId)
+                        .whereField("status", isEqualTo: "Pending")
+                        .getDocuments { snapshot, error in
+                            guard let documents = snapshot?.documents, error == nil else {
+                                print("Error fetching pending requests: \(error?.localizedDescription ?? "Unknown error")")
+                                completion(true) // Still consider it successful if the update succeeded
+                                return
+                            }
+
+                            for document in documents {
+                                let otherRequest = try? document.data(as: Request.self)
+
+                                // Skip the approved request
+                                if otherRequest?.id == requestId {
+                                    continue
+                                }
+
+                                // Check if the request overlaps with the approved request
+                                if let otherRequest = otherRequest,
+                                   (otherRequest.dateBegin < approvedRequest.dateEnd &&
+                                    otherRequest.dateEnd > approvedRequest.dateBegin) {
+                                    
+                                    // Deny the request
+                                    self.denyRequest(requestId: otherRequest.id!) { _ in }
+                                }
+                            }
+                            
+                            completion(true) // Final success completion after processing all requests
+                        }
+                }
+            } else {
+                completion(false)
+            }
+        }
     }
     
     func denyRequest(requestId: String, completion: @escaping (Bool) -> Void) {
