@@ -112,6 +112,7 @@ struct MessageView: View {
             .onAppear {
                 requestVM.fetchAllUserRequest(userId: authenticationVM.userID)
                 requestVM.fetchAllOwnerRequest(ownerId: authenticationVM.userID)
+                self.status = "All"
             }
         }
     }
