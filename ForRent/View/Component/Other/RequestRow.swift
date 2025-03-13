@@ -13,18 +13,34 @@ struct RequestRow: View {
     @Environment(LocationVM.self) var locationVM
     @Environment(RequestVM.self) var requestVM
 
-    @State private var owner: User = User()
-    @State private var property: Property = Property()
+    @AppStorage("currentRole") private var currentRole: String = "Guest" // Check user role
     
+    @State private var owner: User = User()
+    @State private var guestName: String = ""
+    @State private var property: Property = Property()
+
     let request: Request
     
     private func fetchRequestData() {
+        // Fetch host (property owner) info
         userVM.fetchOwnerInfo(ownerId: request.ownerId) { owner in
             if let ownerData = owner {
                 self.owner = ownerData
             }
         }
+
+        // Fetch guest (only if current role is a host)
+        if currentRole != "Guest" {
+            userVM.fetchOwnerInfo(ownerId: request.userId) { guest in
+                if let guestData = guest {
+                    self.guestName = guestData.username
+                } else {
+                    self.guestName = "Unknown"
+                }
+            }
+        }
         
+        // Fetch property info
         propertyVM.getPropertyById(propertyId: request.propertyId) { property in
             if let propertyData = property {
                 self.property = propertyData
@@ -45,13 +61,22 @@ struct RequestRow: View {
                         .font(.custom(Constant.Font.regular, size: 14))
                 }
                 .foregroundStyle(Color(Constant.Color.primaryText))
+                
                 Text(property.title)
                     .font(.custom(Constant.Font.semiBold, size: 16))
                     .lineLimit(1)
                     .truncationMode(.tail)
-                Text("Host: \(owner.username)")
-                    .font(.custom(Constant.Font.regular, size: 14))
-                    .foregroundStyle(Color(Constant.Color.sencondaryText))
+                
+                if currentRole != "Guest" {
+                    Text("Guest: \(guestName)")
+                        .font(.custom(Constant.Font.regular, size: 14))
+                        .foregroundStyle(Color(Constant.Color.sencondaryText))
+                } else {
+                    Text("Host: \(owner.username)")
+                        .font(.custom(Constant.Font.regular, size: 14))
+                        .foregroundStyle(Color(Constant.Color.sencondaryText))
+                }
+                
                 HStack {
                     Text(
                         "\(request.dateBegin.getShortestMonthDayFormat()) - \(request.dateEnd.getShortestMonthDayFormat())"
@@ -65,7 +90,6 @@ struct RequestRow: View {
                 }
             }
             Spacer()
-            
         }
         .onAppear {
             fetchRequestData()

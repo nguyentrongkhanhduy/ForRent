@@ -13,6 +13,7 @@ struct RequestCancelView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(PropertyVM.self) var propertyVM
     @Environment(RequestVM.self) var requestVM
+    @Environment(UserVM.self) var userVM
     @AppStorage("currentRole") private var currentRole: String = "Guest"
     @Binding var tab: Int
     
@@ -21,6 +22,7 @@ struct RequestCancelView: View {
     
     // Fetched property details.
     @State private var property: Property?
+    @State private var userInfo: User?
     
     // For local date display.
     @State private var startDate: Date = Date()
@@ -45,6 +47,51 @@ struct RequestCancelView: View {
                         Divider()
                             .frame(height: 5)
                             .background(Color(.systemGray5))
+                        
+                        if let user = userInfo {
+                            VStack(alignment: .leading) {
+                                Text(currentRole == "Guest" ? "Host Information" : "Guest Information")
+                                    .font(.custom(Constant.Font.semiBold, size: 18))
+                                    .padding()
+
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 5) {
+                                        HStack {
+                                            Text("Username:")
+                                                .font(.custom(Constant.Font.semiBold, size: 15))
+                                            Spacer()
+                                            Text(user.username)
+                                                .font(.custom(Constant.Font.regular, size: 15))
+                                                .foregroundStyle(Color(Constant.Color.primaryText))
+                                        }
+
+                                        HStack {
+                                            Text("Email:")
+                                                .font(.custom(Constant.Font.semiBold, size: 15))
+                                            Spacer()
+                                            Text(user.email)
+                                                .font(.custom(Constant.Font.regular, size: 15))
+                                                .foregroundStyle(Color(Constant.Color.primaryText))
+                                        }
+
+                                        HStack {
+                                            Text("Phone:")
+                                                .font(.custom(Constant.Font.semiBold, size: 15))
+                                            Spacer()
+                                            Text(user.phone.isEmpty ? "N/A" : user.phone)
+                                                .font(.custom(Constant.Font.regular, size: 15))
+                                                .foregroundStyle(Color(Constant.Color.primaryText))
+                                        }
+                                    }
+                                }
+                                .background(Color.white)
+                                .padding(.horizontal)
+                            }
+                        }
+                        Divider()
+                            .frame(height: 5)
+                            .background(Color(.systemGray5))
+
                         
                         // Request details section.
                         VStack(alignment: .leading) {
@@ -205,6 +252,11 @@ struct RequestCancelView: View {
                 startDate = request.dateBegin
                 endDate = request.dateEnd
                 curStatus = request.status
+                
+                let userId = currentRole == "Guest" ? request.ownerId : request.userId
+                userVM.fetchOwnerInfo(ownerId: userId) { user in
+                    self.userInfo = user
+                }
             }
         }
     }
