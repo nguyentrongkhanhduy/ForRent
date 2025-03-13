@@ -26,6 +26,8 @@ struct ProfileView: View {
                 showBlur = true
             }
             
+            currentRole = "Guest"
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 self.tab = 0
                 withAnimation {
