@@ -70,9 +70,9 @@ class PropertyVM {
     func getFilteredProperties(price: String, bath: String, bed: String, guest: String, date: Date) -> [Property] {
             return listProperty.filter { property in
                 (price.isEmpty || property.price <= Double(price) ?? Double.infinity) &&
-                (bath.isEmpty || String(property.bathroom) == bath) &&
-                (bed.isEmpty || String(property.bedroom) == bed) &&
-                (guest.isEmpty || String(property.guest) == guest)
+                (bath.isEmpty || property.bathroom == Int(bath.prefix(1))) &&
+                (bed.isEmpty || property.bedroom == Int(bed.prefix(1))) &&
+                (guest.isEmpty || property.guest == Int(guest.prefix(1)))
                 && (date <= property.dateAvailable)
             }
         }
