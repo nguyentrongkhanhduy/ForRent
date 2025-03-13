@@ -17,13 +17,16 @@ struct MessageView: View {
     @AppStorage("currentRole") private var currentRole: String = "Guest"
     @State private var toLoginScreen = false
     @State private var toSignupScreen = false
-    @State private var role = "All"
     @State private var status = "All"
 
     @Binding var tab: Int
-
-    var filteredRequests: [Request] {
-        requestVM.filterRequest(userId: authenticationVM.userID, role: role, status: status)
+    
+    var filterUserRequests: [Request] {
+        requestVM.filterUserRequest(status: status)
+    }
+    
+    var filterOwnerRequests: [Request] {
+        requestVM.filterOwnerRequest(status: status)
     }
 
     var body: some View {
@@ -35,31 +38,60 @@ struct MessageView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
                 
-                
                 if authenticationVM.isLoggedIn {
-                    RequestFilterBar(role: $role, status: $status)
                     
-                    if filteredRequests.isEmpty {
-                        VStack {
-                            Text("No matching requests.")
-                                .font(.custom(Constant.Font.semiBold, size: 20))
-                                .foregroundStyle(Color(Constant.Color.sencondaryText))
-                            Spacer()
-                        }
-                        .padding(30)
-                    } else {
-                        List {
-                            ForEach(filteredRequests, id: \.self) { request in
-                                NavigationLink {
-                                    RequestCancelView(tab: $tab, request: request)
-                                } label: {
-                                    RequestRow(request: request)
-                                }
-                                .listRowSeparator(.hidden)
-                                .padding(.bottom)
+                    HStack {
+                        Spacer()
+                        FilterRequestBar(status: $status)
+                            .padding(.trailing)
+                    }
+                    
+                    if currentRole == "Guest" {
+                        if filterUserRequests.isEmpty {
+                            VStack {
+                                Text("No matching requests.")
+                                    .font(.custom(Constant.Font.semiBold, size: 20))
+                                    .foregroundStyle(Color(Constant.Color.sencondaryText))
+                                Spacer()
                             }
+                            .padding(30)
+                        } else {
+                            List {
+                                ForEach(filterUserRequests, id: \.self) { request in
+                                    NavigationLink {
+                                        RequestCancelView(tab: $tab, request: request)
+                                    } label: {
+                                        RequestRow(request: request)
+                                    }
+                                    .listRowSeparator(.hidden)
+                                    .padding(.bottom)
+                                }
+                            }
+                            .listStyle(.plain)
                         }
-                        .listStyle(.plain)
+                    } else {
+                        if filterOwnerRequests.isEmpty {
+                            VStack {
+                                Text("No matching requests.")
+                                    .font(.custom(Constant.Font.semiBold, size: 20))
+                                    .foregroundStyle(Color(Constant.Color.sencondaryText))
+                                Spacer()
+                            }
+                            .padding(30)
+                        } else {
+                            List {
+                                ForEach(filterOwnerRequests, id: \.self) { request in
+                                    NavigationLink {
+                                        RequestCancelView(tab: $tab, request: request)
+                                    } label: {
+                                        RequestRow(request: request)
+                                    }
+                                    .listRowSeparator(.hidden)
+                                    .padding(.bottom)
+                                }
+                            }
+                            .listStyle(.plain)
+                        }
                     }
                 } else {
                     TemporaryViewForLogin(screenId: 2) {
@@ -78,7 +110,8 @@ struct MessageView: View {
                 SignupView(tab: $tab)
             }
             .onAppear {
-                requestVM.fetchAllRequest()
+                requestVM.fetchAllUserRequest(userId: authenticationVM.userID)
+                requestVM.fetchAllOwnerRequest(ownerId: authenticationVM.userID)
             }
         }
     }

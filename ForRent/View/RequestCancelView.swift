@@ -133,7 +133,7 @@ struct RequestCancelView: View {
                         // Action Buttons – host mode vs guest mode.
                         if currentRole != "Guest" {
                             if curStatus == "Pending" {
-                                SecondaryButton(text: "Approve Request") {
+                                PrimaryButton(text: "Approve Request") {
                                     showAlert = true
                                     alertTitle = "Approve Request"
                                     alertMessage = "Are you sure you want to approve this request?"
