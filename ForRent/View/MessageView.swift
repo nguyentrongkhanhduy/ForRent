@@ -35,9 +35,10 @@ struct MessageView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
                 
-                RequestFilterBar(role: $role, status: $status)
                 
                 if authenticationVM.isLoggedIn {
+                    RequestFilterBar(role: $role, status: $status)
+                    
                     if filteredRequests.isEmpty {
                         VStack {
                             Text("No matching requests.")

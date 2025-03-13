@@ -270,7 +270,7 @@ struct RequestCancelView: View {
             if success {
                 curStatus = "Cancelled"
                 alertTitle = "Success"
-                alertMessage = "Request cancelled successfully."
+                alertMessage = "Request cancelled."
             } else {
                 alertTitle = "Error"
                 alertMessage = "Failed to cancel request."
