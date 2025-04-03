@@ -39,4 +39,19 @@
 - **@Observable** – Leveraging the latest data-driven updates in Swift
 
 ---
-   
+## Setup Instructions
+1. Clone repo
+2. Open in Xcode:
+	•	Use Xcode 15 or later
+	•	Open ForRent.xcodeproj
+2.	Open in Xcode:
+	•	Use Xcode 15 or later
+	•	Open ForRent.xcodeproj
+3.	Firebase Setup:
+	•	Create a project at Firebase Console
+	•	Download GoogleService-Info.plist and add it to the Xcode project
+	•	Enable Firestore, Authentication, and Storage
+	•	Update Firestore rules if needed
+4.	Run on Simulator:
+	•	Choose your desired iPhone simulator
+	•	Press ⌘R to build and run
